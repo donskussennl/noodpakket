@@ -1,5 +1,5 @@
 // server/api/checkout.post.ts
-import createMollieClient from '@mollie/api-client'
+import { createMollieClient } from '@mollie/api-client'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -16,30 +16,52 @@ export default defineEventHandler(async (event) => {
   }
 
   const config = useRuntimeConfig()
-  const mollieClient = createMollieClient({
-    apiKey: config.mollieApiKey,
+
+  console.log('🧪 Mollie config:', {
+    apiKeyPrefix: config.mollieApiKey?.slice(0, 5), // test_ of live_
+    redirect: config.mollieRedirectUrl,
+    webhook: config.mollieWebhookUrl,
   })
+
+  if (!config.mollieApiKey) {
+    console.error('❌ MOLLIE_API_KEY ontbreekt in runtimeConfig')
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Betaalconfiguratie ontbreekt (API key).',
+    })
+  }
+
+  const mollieClient = createMollieClient({ apiKey: config.mollieApiKey })
 
   const amountStr = body.price.toFixed(2)
 
-  const payment = await mollieClient.payments.create({
-    amount: {
-      currency: 'EUR',
-      value: amountStr,
-    },
-    description: body.description || 'Voerbox op maat',
-    redirectUrl: config.mollieRedirectUrl,
-    webhookUrl: config.mollieWebhookUrl,
-    metadata: body.meta || {},
-  })
+  try {
+    const payment = await mollieClient.payments.create({
+      amount: {
+        currency: 'EUR',
+        value: amountStr,
+      },
+      description: body.description || 'Noodpakket op maat',
+      redirectUrl: config.mollieRedirectUrl,
+      webhookUrl: config.mollieWebhookUrl,
+      metadata: body.meta || {},
+    })
 
-  // Mollie client heeft helper: payment.getCheckoutUrl()
-  // of: payment._links.checkout.href
-  // beide zijn ok volgens de officiële client. 
-  // @ts-ignore – type defs lopen soms achter
-  const checkoutUrl = payment.getCheckoutUrl
-    ? payment.getCheckoutUrl()
-    : payment._links.checkout.href
+    // @ts-ignore
+    const checkoutUrl = payment.getCheckoutUrl
+      ? payment.getCheckoutUrl()
+      : payment._links.checkout.href
 
-  return { url: checkoutUrl }
+    return { url: checkoutUrl }
+  } catch (err: any) {
+    console.error('❌ Mollie betaalfout:', err?.message || err)
+
+    throw createError({
+      statusCode: 500,
+      statusMessage:
+        err?.response?.body?.detail ||
+        err?.message ||
+        'Kon betaling niet starten bij Mollie.',
+    })
+  }
 })

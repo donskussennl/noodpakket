@@ -80,9 +80,10 @@ const pay = async () => {
     })
 
     window.location.href = url
-  } catch (e) {
-    console.error(e)
-    error.value = 'Er ging iets mis bij het starten van de betaling.'
+  } catch (e: any) {
+    console.error('Checkout error:', e)
+    const msg = e?.data?.statusMessage || e?.data?.message || null
+    error.value = msg || 'Er ging iets mis bij het starten van de betaling.'
   } finally {
     loading.value = false
   }

@@ -28,7 +28,7 @@ interface IntakeState {
   address: Address
 }
 
-const BASE_PRICE = 30
+const BASE_PRICE = 79
 const FOOD_PACKAGE_PRICE = 29
 const HYGIENE_PRICES: Record<HygieneOption, number> = {
   handgel: 3,
