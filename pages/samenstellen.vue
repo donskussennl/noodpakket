@@ -1,4 +1,23 @@
 <script setup lang="ts">
+import { ESSENTIAL_PRODUCTS, type EssentialProductKey } from '~/data/essentialProducts'
+
+const showEssentialInfo = ref(false)
+const selectedEssentialKey = ref<EssentialProductKey | null>(null)
+
+const selectedEssentialProduct = computed(() => {
+  return ESSENTIAL_PRODUCTS.find(p => p.id === selectedEssentialKey.value) || null
+})
+
+const openEssentialProduct = (key: EssentialProductKey) => {
+  selectedEssentialKey.value = key
+  showEssentialInfo.value = true
+}
+
+const closeEssentialProduct = () => {
+  showEssentialInfo.value = false
+  selectedEssentialKey.value = null
+}
+
 const {
   intake,
   calculatePrice,
@@ -86,7 +105,7 @@ const goToCart = () => {
       <header class="space-y-2 mb-8 md:mb-10">
         <div class="space-y-1">
         <p class="text-sm font-medium tracking-wide uppercase text-emerald-700"> Slechts 31% van NL is echt voorbereid </p>
-          <h1 class="text-xl md:text-3xl font-semibold">Stel je noodpakket samen</h1>
+          <h1 class="text-xl md:text-3xl font-semibold">Stel je eigen noodpakket samen</h1>
           <p class="text-base md:text-xl text-slate-800">
             Bereid je huishouden voor op een noodgeval. Met dit noodpakket kom je de eerste 72 uur door.
           </p>
@@ -150,136 +169,39 @@ const goToCart = () => {
 
 
             <div class="space-y-1">
-
               <div class="flex flex-wrap gap-3">
-                <!-- Wateropslag -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
+                <button
+                  v-for="product in ESSENTIAL_PRODUCTS"
+                  :key="product.id"
+                  type="button"
+                  class="group flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
+                        bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-2
+                        hover:shadow-md hover:-translate-y-[1px] transition"
+                  @click="openEssentialProduct(product.id)"
                 >
-               
                   <span class="font-medium text-slate-900">
-                    Wateropslag
+                    {{ product.label }}
                   </span>
-                </div>
 
-                <!-- Noodradio -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-       
-                  <span class="font-medium text-slate-900">
-                    FM-Noodradio
+                  <!-- kleine hint dat het klikbaar is -->
+                  <span class="inline-flex items-center gap-1 text-xs text-emerald-700">
+                    <span
+                      class="inline-flex items-center justify-center w-4 h-4 rounded-full border border-emerald-700 text-[9px] leading-none"
+                    >
+                      i
+                    </span>
+                    <span class="underline-offset-2 group-hover:underline">
+                      Meer uitleg
+                    </span>
                   </span>
-                </div>
-
-                <!-- Powerbank -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-  
-                  <span class="font-medium text-slate-900">
-                    Powerbank
-                  </span>
-                </div>
-
-                <!-- Zaklamp -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-  
-                  <span class="font-medium text-slate-900">
-                    Zaklamp
-                  </span>
-                </div>
-
-                <!-- Batterijen -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-
-                  <span class="font-medium text-slate-900">
-                    Batterijen
-                  </span>
-                </div>
-
-                <!-- EHBO-set -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-      
-                  <span class="font-medium text-slate-900">
-                    EHBO-kit
-                  </span>
-                </div>
-
-                <!-- Lucifers -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-
-                  <span class="font-medium text-slate-900">
-                    Lucifers
-                  </span>
-                </div>
-
-                <!-- Batterijen -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-
-                  <span class="font-medium text-slate-900">
-                    Kaarsen
-                  </span>
-                </div>
-
-                <!-- Batterijen -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-
-                  <span class="font-medium text-slate-900">
-                    Warme deken
-                  </span>
-                </div>
-
-                <!-- Batterijen -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-
-                  <span class="font-medium text-slate-900">
-                    Noodfluitje
-                  </span>
-                </div>
-
-                <!-- Batterijen -->
-                <div
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                         bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-3"
-                >
-
-                  <span class="font-medium text-slate-900">
-                    Plattegrond van je dorp/stad
-                  </span>
-                </div>
-
-         
+                </button>
               </div>
 
               <p class="text-sm text-slate-600">
                 Onmisbare essentials op basis van de checklist van de overheid.
               </p>
             </div>
+
           </section>
 
           <!-- 1. Huishouden -->
@@ -817,4 +739,78 @@ const goToCart = () => {
       </div>
       </div>
   </div>
+  <!-- Modal: uitleg essentieel product -->
+<div
+  v-if="showEssentialInfo && selectedEssentialProduct"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+  @click.self="closeEssentialProduct"
+>
+  <div class="bg-white rounded-2xl max-w-md w-full mx-4 p-6 space-y-4 shadow-lg">
+    <div class="flex items-start justify-between gap-4">
+      <h3 class="text-lg font-semibold text-slate-900">
+        {{ selectedEssentialProduct.label }}
+      </h3>
+      <button
+        type="button"
+        class="text-slate-400 hover:text-slate-600"
+        @click="closeEssentialProduct"
+        aria-label="Sluiten"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="space-y-3">
+      <div
+        v-if="selectedEssentialProduct.image"
+        class="w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center"
+      >
+        <img
+          :src="selectedEssentialProduct.image"
+          :alt="selectedEssentialProduct.label"
+          class="w-full h-full object-cover"
+        />
+      </div>
+
+      <p class="text-sm text-slate-700">
+        {{ selectedEssentialProduct.description }}
+      </p>
+
+      <ul
+        v-if="selectedEssentialProduct.bullets?.length"
+        class="space-y-2"
+      >
+        <li
+          v-for="(item, index) in selectedEssentialProduct.bullets"
+          :key="index"
+          class="flex items-start gap-2 text-sm text-slate-700"
+        >
+          <!-- icoon -->
+          <span class="mt-[2px] text-lg leading-none">
+            <template v-if="item.type === 'check'">✔️</template>
+            <template v-else-if="item.type === 'cross'">❌</template>
+            <template v-else>•</template>
+          </span>
+
+          <!-- tekst of html -->
+          <span v-if="item.html" v-html="item.html"></span>
+          <span v-else>{{ item.text }}</span>
+        </li>
+      </ul>
+
+
+    </div>
+
+    <div class="pt-2 flex justify-end">
+      <button
+        type="button"
+        class="inline-flex items-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+        @click="closeEssentialProduct"
+      >
+        Begrijp ik
+      </button>
+    </div>
+  </div>
+</div>
+
 </template>
