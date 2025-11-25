@@ -205,6 +205,7 @@ const goToCheckout = () => {
               </span>
             </div>
 
+
             <div
               v-if="intake.foodInventory === 'buy'"
               class="flex justify-between text-xs"
@@ -255,7 +256,11 @@ const goToCheckout = () => {
             </div>
 
 
-            
+            <!-- Verzendkosten -->
+            <div class="flex justify-between text-xs">
+                <span class="text-slate-800">Verzendkosten</span>
+                <span class="font-medium text-orange-600">Gratis</span>
+            </div>
 
 
             <div class="border-t border-emerald-100 pt-3 mt-2 flex justify-between items-baseline">
@@ -274,9 +279,38 @@ const goToCheckout = () => {
             class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-700"
             type="button"
             @click="goToCheckout"
-          >
+            >
             Ik ga bestellen
-          </button>
+            </button>
+
+            <!-- Betaalmethoden -->
+            <div class="flex items-center justify-center gap-4 mt-3 opacity-70">
+            <!-- iDEAL -->
+            <img
+                src="../images/ideal.svg"
+                alt="iDEAL"
+                class="h-6 w-auto"
+            />
+
+            <!-- Creditcards (Visa + Mastercard naast elkaar gezet in één afbeelding voor nette schaal) -->
+            <img
+                src="../images/visa.svg"
+                alt="Visa"
+                class="h-6 w-auto"
+            />
+
+            <img
+                src="../images/mastercard.svg"
+                alt="Mastercard"
+                class="h-6 w-auto"
+            />
+            <img
+                src="../images/postnl.svg"
+                alt="PostNL"
+                class="h-6 w-auto"
+            />
+            </div>
+
         </div>
       </div>
     </div>

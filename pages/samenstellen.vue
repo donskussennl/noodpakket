@@ -104,7 +104,7 @@ const goToCart = () => {
       <!-- Globale kop + intro -->
       <header class="space-y-2 mb-8 md:mb-10">
         <div class="space-y-1">
-        <p class="text-sm font-medium tracking-wide uppercase text-emerald-700"> Slechts 31% van NL is echt voorbereid </p>
+        <p class="text-sm font-medium tracking-wide uppercase text-emerald-700"> Meer dan 5,5 miljoen Nederlanders zijn al voorbereid </p>
           <h1 class="text-xl md:text-3xl font-semibold">Stel je eigen noodpakket samen</h1>
           <p class="text-base md:text-xl text-slate-800">
             Bereid je huishouden voor op een noodgeval. Met dit noodpakket kom je de eerste 72 uur door.
@@ -174,9 +174,9 @@ const goToCart = () => {
                   v-for="product in ESSENTIAL_PRODUCTS"
                   :key="product.id"
                   type="button"
-                  class="group flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                        bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-2
-                        hover:shadow-md hover:-translate-y-[1px] transition"
+                  class="group flex-1 min-w-[140px] rounded-2xl border border-slate-200 px-5 py-4 text-center text-base md:text-lg font-medium
+       bg-white shadow-sm flex flex-col items-center gap-2
+       hover:border-slate-300 hover:shadow-md hover:-translate-y-[1px] transition"
                   @click="openEssentialProduct(product.id)"
                 >
                   <span class="font-medium text-slate-900">
@@ -217,10 +217,13 @@ const goToCart = () => {
                 <button
                   v-for="n in [1,2,3,4,5,6]"
                   :key="n"
-                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="intake.persons === n && 'border-emerald-500 bg-emerald-50 shadow-sm'"
+                  class="flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="{
+                      'border-emerald-500 bg-emerald-50 shadow-md': intake.persons === n
+                  }"
                   @click="intake.persons = n"
                 >
+
                   <div class="text-slate-900">
                     {{ n === 6 ? '6 personen' : n + (n === 1 ? ' persoon' : ' personen') }}
                   </div>
@@ -231,7 +234,7 @@ const goToCart = () => {
               </p>
               <button
                 type="button"
-                class="inline-flex items-center gap-1 text-sm text-emerald-700 hover:text-emerald-800"
+                class="inline-flex items-center gap-1 text-sm text-emerald-700 hover:text-emerald-800 "
                 @click="showPackageInfo = true"
               >
                 <span>Wat kan ik verwachten?</span>
@@ -252,31 +255,44 @@ const goToCart = () => {
 
             <div class="space-y-2">
               <div class="flex flex-wrap gap-3">
+                <!-- JA: noodvoedselpakket -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="intake.foodInventory === 'buy' && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="{
+                    'border-emerald-500 bg-emerald-50 shadow-md': intake.foodInventory === 'buy',
+                    'border-slate-200': intake.foodInventory !== 'buy'
+                  }"
                   @click="intake.foodInventory = 'buy'"
                 >
-                  <div class="font-medium text-slate-900">Ja, voor {{intake.persons}} personen</div>
+                  <div class="font-medium text-slate-900">Ja, voor {{ intake.persons }} personen</div>
                   <p class="text-sm text-slate-500">
-                    + € {{ (FOOD_PACKAGE_PRICE * intake.persons).toLocaleString('nl-NL', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    }) }}
+                    + €
+                    {{
+                      (FOOD_PACKAGE_PRICE * intake.persons).toLocaleString('nl-NL', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    }}
                   </p>
-                  
                 </button>
+
+                <!-- NEE: geen noodvoedselpakket -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="intake.foodInventory === 'inhouse' && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="{
+                    'border-emerald-500 bg-emerald-50 shadow-md': intake.foodInventory === 'inhouse',
+                    'border-slate-200': intake.foodInventory !== 'inhouse'
+                  }"
                   @click="intake.foodInventory = 'inhouse'"
                 >
                   <div class="font-medium text-slate-900">Geen noodvoedselpakket</div>
                 </button>
               </div>
+
               <p class="text-sm text-slate-600">
                 Genoeg voor de eerste 72 uur van een noodsituatie.
               </p>
+
               <button
                 type="button"
                 class="inline-flex items-center gap-1 text-sm text-emerald-700 hover:text-emerald-800"
@@ -292,6 +308,7 @@ const goToCart = () => {
             </div>
           </section>
 
+
           <!-- 3. Hygiëne -->
           <section class="space-y-4">
             <div class="space-y-1">
@@ -302,8 +319,8 @@ const goToCart = () => {
               <div class="flex flex-wrap gap-3">
                 <!-- Handgel -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasHygiene('handgel') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasHygiene('handgel') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleHygiene('handgel')"
                 >
                   <div class="font-medium text-slate-900">Desinfectie gel</div>
@@ -314,8 +331,8 @@ const goToCart = () => {
 
                 <!-- WC-papier -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasHygiene('wcpapier') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasHygiene('wcpapier') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleHygiene('wcpapier')"
                 >
                   <div class="font-medium text-slate-900">Wc-papier</div>
@@ -326,8 +343,8 @@ const goToCart = () => {
 
                 <!-- Doekjes -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasHygiene('doekjes') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasHygiene('doekjes') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleHygiene('doekjes')"
                 >
                   <div class="font-medium text-slate-900">Natte doekjes</div>
@@ -338,8 +355,8 @@ const goToCart = () => {
 
                 <!-- Tandenborstel -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasHygiene('tandenborstel') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasHygiene('tandenborstel') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleHygiene('tandenborstel')"
                 >
                   <div class="font-medium text-slate-900">Tandpasta + tandenborstel</div>
@@ -350,8 +367,8 @@ const goToCart = () => {
 
                 <!-- Maandverband -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasHygiene('maandverband') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasHygiene('maandverband') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleHygiene('maandverband')"
                 >
                   <div class="font-medium text-slate-900">Maandverband</div>
@@ -385,8 +402,8 @@ const goToCart = () => {
               <div class="flex flex-wrap gap-3">
                 <!-- Hamer -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasTool('hammer') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasTool('hammer') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleTool('hammer')"
                 >
                   <div class="font-medium text-slate-900">Hamer</div>
@@ -397,8 +414,8 @@ const goToCart = () => {
 
                 <!-- opener -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasTool('opener') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasTool('opener') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleTool('opener')"
                 >
                   <div class="font-medium text-slate-900">Blikopener</div>
@@ -409,8 +426,8 @@ const goToCart = () => {
 
                 <!-- Zaag -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasTool('saw') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasTool('saw') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleTool('saw')"
                 >
                   <div class="font-medium text-slate-900">Zaag</div>
@@ -421,8 +438,8 @@ const goToCart = () => {
 
                 <!-- Tang -->
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="hasTool('tang') && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="hasTool('tang') && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="toggleTool('tang')"
                 >
                   <div class="font-medium text-slate-900">Kniptang</div>
@@ -468,8 +485,8 @@ const goToCart = () => {
             <div class="space-y-1">
               <div class="flex flex-wrap gap-3">
                 <button
-                  class="flex-1 min-w-[160px] rounded-2xl border px-5 py-4 text-left text-base md:text-lg font-medium transition hover:border-emerald-500 hover:bg-emerald-50"
-                  :class="intake.flightbag === 'yes' && 'border-emerald-500 bg-emerald-50'"
+                  class="flex-1 min-w-[160px] rounded-2xl border border-slate-200 px-5 py-4 text-left text-base md:text-lg font-medium transition shadow-sm hover:border-emerald-500 hover:bg-emerald-50"
+                  :class="intake.flightbag === 'yes' && 'border-emerald-500 bg-emerald-50 shadow-md'"
                   @click="intake.flightbag = 'yes'"
                 >
                   <div class="font-medium text-slate-900">Vluchttas toevoegen</div>

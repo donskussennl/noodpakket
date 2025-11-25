@@ -112,7 +112,7 @@ const goToCart = () => {
       <!-- Globale kop + intro -->
       <header class="space-y-2 mb-8 md:mb-10">
         <div class="space-y-1">
-        <p class="text-sm font-medium tracking-wide uppercase text-emerald-700"> Slechts 31% van NL is echt voorbereid </p>
+        <p class="text-sm font-medium tracking-wide uppercase text-emerald-700"> Meer dan 5,5 miljoen Nederlanders zijn al voorbereid </p>
           <h1 class="text-xl md:text-3xl font-semibold">Noodpakket compleet</h1>
           <p class="text-base md:text-xl text-slate-800">
             Bereid je huishouden voor op een noodgeval. Met dit noodpakket kom je de eerste 72 uur door.
@@ -182,9 +182,9 @@ const goToCart = () => {
                   v-for="product in ESSENTIAL_PRODUCTS"
                   :key="product.id"
                   type="button"
-                  class="group flex-1 min-w-[140px] rounded-2xl border px-5 py-4 text-center text-base md:text-lg font-medium
-                        bg-emerald-50 border-emerald-500 shadow-sm flex flex-col items-center gap-2
-                        hover:shadow-md hover:-translate-y-[1px] transition"
+                  class="group flex-1 min-w-[140px] rounded-2xl border border-slate-200 px-5 py-4 text-center text-base md:text-lg font-medium
+       bg-white shadow-sm flex flex-col items-center gap-2
+       hover:border-slate-300 hover:shadow-md hover:-translate-y-[1px] transition"
                   @click="openEssentialProduct(product.id)"
                 >
                   <span class="font-medium text-slate-900">

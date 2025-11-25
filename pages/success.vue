@@ -1,11 +1,30 @@
 <script setup lang="ts">
 const route = useRoute()
 const paymentId = computed(() => route.query.id as string | undefined)
+
+// intake komt uit je bestaande composable
+const { intake } = useIntake()
+
+onMounted(() => {
+  if (!(window as any).gtag) return
+
+  const amount = intake.value?.price ?? 0
+
+  ;(window as any).gtag('event', 'conversion', {
+    send_to: 'AW-17758447312/ralqCMK4vsYbENDN8ZNC',
+    value: amount,
+    currency: 'EUR',
+    transaction_id: paymentId.value || '',
+  })
+})
+
 </script>
 
 <template>
   <div class="min-h-screen text-slate-50 flex items-center justify-center px-4">
-    <div class="w-full max-w-xl bg-slate-900/80 border border-slate-800 rounded-3xl shadow-xl p-8 md:p-10 space-y-4 text-center">
+    <div
+      class="w-full max-w-xl bg-slate-900/80 border border-slate-800 rounded-3xl shadow-xl p-8 md:p-10 space-y-4 text-center"
+    >
       <h1 class="text-2xl font-semibold">Bedankt voor je bestelling 🎉</h1>
       <p class="text-sm text-slate-300">
         We hebben je betaling ontvangen of zijn deze aan het verwerken. Je ontvangt je noodpakket binnen 5 werkdagen.

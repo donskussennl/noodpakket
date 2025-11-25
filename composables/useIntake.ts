@@ -13,6 +13,7 @@ interface Address {
   street: string
   houseNumber: string
   postalCode: string
+  phone: string
   city: string
   country: string
 }
@@ -64,6 +65,7 @@ export const useIntake = () => {
       street: '',
       houseNumber: '',
       postalCode: '',
+      phone: '',
       city: '',
       country: 'Nederland',
     },

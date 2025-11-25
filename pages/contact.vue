@@ -9,7 +9,52 @@ useHead({
     },
   ],
 })
+
+const name = ref('')
+const email = ref('')
+const message = ref('')
+
+const loading = ref(false)
+const success = ref<string | null>(null)
+const error = ref<string | null>(null)
+
+const isValid = computed(() => {
+  return name.value.trim() && email.value.trim() && message.value.trim()
+})
+
+const onSubmit = async () => {
+  if (!isValid.value) return
+
+  loading.value = true
+  success.value = null
+  error.value = null
+
+  try {
+    await $fetch('/api/contact', {
+      method: 'POST',
+      body: {
+        name: name.value,
+        email: email.value,
+        message: message.value,
+      },
+    })
+
+    success.value = 'Je bericht is verstuurd. We nemen zo snel mogelijk contact met je op.'
+    name.value = ''
+    email.value = ''
+    message.value = ''
+  } catch (e: any) {
+    console.error('Contact error:', e)
+    error.value =
+      e?.data?.statusMessage ||
+      e?.data?.message ||
+      'Er ging iets mis bij het versturen van je bericht.'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
+
 
 <template>
   <div class="min-h-screen bg-[#FFFDF3] text-slate-900">
@@ -73,47 +118,60 @@ useHead({
           Vul je gegevens in en we nemen zo snel mogelijk contact met je op.
         </p>
 
-        <form class="space-y-6">
-          <div class="grid md:grid-cols-2 gap-6">
-            <div class="space-y-2">
-              <label class="text-sm font-medium text-slate-900">Naam</label>
-              <input
-                type="text"
-                placeholder="Je naam"
-                class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600"
-              />
+        <form class="space-y-6" @submit.prevent="onSubmit">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-900">Naam</label>
+                <input
+                    v-model="name"
+                    type="text"
+                    placeholder="Je naam"
+                    class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600"
+                    required
+                />
+                </div>
+
+                <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-900">E-mail</label>
+                <input
+                    v-model="email"
+                    type="email"
+                    placeholder="jij@email.nl"
+                    class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600"
+                    required
+                />
+                </div>
             </div>
 
             <div class="space-y-2">
-              <label class="text-sm font-medium text-slate-900">E-mail</label>
-              <input
-                type="email"
-                placeholder="jij@email.nl"
-                class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm focus:border-emerald-600 focus:ring-emerald-600"
-              />
+                <label class="text-sm font-medium text-slate-900">Bericht</label>
+                <textarea
+                v-model="message"
+                rows="5"
+                placeholder="Waar kunnen we je mee helpen?"
+                class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm resize-none focus:border-emerald-600 focus:ring-emerald-600"
+                required
+                ></textarea>
             </div>
-          </div>
 
-          <div class="space-y-2">
-            <label class="text-sm font-medium text-slate-900">Bericht</label>
-            <textarea
-              rows="5"
-              placeholder="Waar kunnen we je mee helpen?"
-              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm shadow-sm resize-none focus:border-emerald-600 focus:ring-emerald-600"
-            ></textarea>
-          </div>
+            <button
+                type="submit"
+                :disabled="loading || !isValid"
+                class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm md:text-base font-medium text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <span v-if="!loading">Bericht versturen</span>
+                <span v-else>Bericht wordt verstuurd…</span>
+                <span aria-hidden="true">→</span>
+            </button>
 
-          <button
-            type="submit"
-            disabled
-            class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm md:text-base font-medium text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
-          >
-            Bericht versturen
-            <span aria-hidden="true">→</span>
-          </button>
+            <p v-if="success" class="text-sm text-emerald-700">
+                {{ success }}
+            </p>
+            <p v-if="error" class="text-sm text-red-600">
+                {{ error }}
+            </p>
+            </form>
 
-
-        </form>
       </section>
     </main>
   </div>
