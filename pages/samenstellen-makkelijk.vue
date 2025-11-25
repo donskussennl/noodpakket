@@ -6,13 +6,40 @@ const {
   calculatePrice,
   BASE_PRICE,
   FLIGHTBAG_PRICE,
+  HYGIENE_PRICES,
+  TOOL_PRICES,
 } = useIntake()
 
 type HygieneOption = 'handgel' | 'wcpapier' | 'doekjes' | 'tandenborstel' | 'maandverband'
 type ToolsOption = 'hammer' | 'tang' | 'saw' | 'opener'
 
+// alle opties als constante lijsten
+const ALL_HYGIENE: HygieneOption[] = [
+  'handgel',
+  'wcpapier',
+  'doekjes',
+  'tandenborstel',
+  'maandverband',
+]
+
+const ALL_TOOLS: ToolsOption[] = ['hammer', 'tang', 'saw', 'opener']
+
 const hygieneChoice = ref<'pakket' | 'geen'>('geen')
 const toolsChoice = ref<'pakket' | 'geen'>('geen')
+
+// totaalprijs voor compleet hygiëne pakket
+const fullHygienePrice = computed(() => {
+  return ALL_HYGIENE.reduce((sum, key) => {
+    return sum + HYGIENE_PRICES[key]
+  }, 0)
+})
+
+// totaalprijs voor compleet noodgereedschap pakket
+const fullToolsPrice = computed(() => {
+  return ALL_TOOLS.reduce((sum, key) => {
+    return sum + TOOL_PRICES[key]
+  }, 0)
+})
 
 // bij binnenkomst: defaults + keuzes syncen met intake
 onMounted(() => {
@@ -46,20 +73,12 @@ const setFlightbag = (value: 'yes' | 'no') => {
 
 const setHygieneChoice = (choice: 'pakket' | 'geen') => {
   hygieneChoice.value = choice
-  const ALL_HYGIENE: HygieneOption[] = [
-    'handgel',
-    'wcpapier',
-    'doekjes',
-    'tandenborstel',
-    'maandverband',
-  ]
   intake.value.hygiene = choice === 'pakket' ? [...ALL_HYGIENE] : []
   calculatePrice()
 }
 
 const setToolsChoice = (choice: 'pakket' | 'geen') => {
   toolsChoice.value = choice
-  const ALL_TOOLS: ToolsOption[] = ['hammer', 'tang', 'saw', 'opener']
   intake.value.tools = choice === 'pakket' ? [...ALL_TOOLS] : []
   calculatePrice()
 }
@@ -99,7 +118,7 @@ const goToCart = () => {
 
         <div class="flex items-baseline justify-between pt-3 border-t border-slate-200">
           <span class="text-sm text-slate-600">
-            Totale pakketprijs
+            Huidige pakketprijs
           </span>
           <span class="text-xl md:text-2xl font-semibold text-slate-900">
             € {{ (intake.price || BASE_PRICE).toLocaleString('nl-NL', {
@@ -214,6 +233,12 @@ const goToCart = () => {
             <p class="mt-1 text-slate-600">
               Alle aanbevolen hygiëneproducten (zoals handgel, wc-papier en maandverband) worden toegevoegd.
             </p>
+            <p class="mt-1 text-xs text-slate-500">
+              + € {{ fullHygienePrice.toLocaleString('nl-NL', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              }) }}
+            </p>
           </button>
 
           <button
@@ -247,6 +272,12 @@ const goToCart = () => {
             <p class="mt-1 text-slate-600">
               We voegen een basisset gereedschap toe zoals hamer, zaag, tang en blikopener.
             </p>
+            <p class="mt-1 text-xs text-slate-500">
+              + € {{ fullToolsPrice.toLocaleString('nl-NL', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              }) }}
+            </p>
           </button>
 
           <button
@@ -266,7 +297,7 @@ const goToCart = () => {
       <!-- CTA naar winkelmandje -->
       <section class="pt-4 border-t border-slate-200 flex items-center justify-between">
         <div class="text-sm">
-          <p class="text-slate-600">Huidige totaalprijs</p>
+          <p class="text-slate-600">Prijs van je noodpakket</p>
           <p class="text-xl font-semibold text-slate-900">
             € {{ (intake.price || BASE_PRICE).toLocaleString('nl-NL', {
               minimumFractionDigits: 2,

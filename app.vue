@@ -82,5 +82,30 @@ const closeMobile = () => {
         <NuxtPage />
       </div>
     </main>
+    <!-- Footer -->
+<footer class="border-t border-slate-200 bg-[#FFFDF3] mt-10">
+  <div class="max-w-6xl mx-auto px-6 py-8">
+    
+    <!-- Icons + copyright in één grid -->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+
+      <!-- Betaalicons -->
+      <div class="flex items-center gap-4 opacity-80">
+        <img src="/images/ideal.svg" alt="iDEAL" class="h-6 w-auto" />
+        <img src="/images/visa.svg" alt="Visa" class="h-6 w-auto" />
+        <img src="/images/mastercard.svg" alt="Mastercard" class="h-6 w-auto" />
+        <img src="/images/postnl.svg" alt="PostNL" class="h-6 w-auto" />
+      </div>
+
+      <!-- Copyright -->
+      <p class="text-xs text-slate-500 text-center md:text-right">
+        © {{ new Date().getFullYear() }} Noodpakket-op-maat.nl — Alle rechten voorbehouden
+      </p>
+
+    </div>
+
+  </div>
+</footer>
+
   </div>
 </template>
