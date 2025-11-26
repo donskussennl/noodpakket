@@ -15,6 +15,6 @@ export default defineNuxtPlugin(() => {
   gtag('config', 'AW-17758447312')
 
   // (optioneel) Google Analytics 4:
- gtag('config', 'G-7WCYLFMN9L')
+ gtag('config', 'G-W4K1B0FNL2')
 })
 
