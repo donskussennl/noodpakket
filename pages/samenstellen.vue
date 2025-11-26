@@ -1,4 +1,13 @@
 <script setup lang="ts">
+useHead({
+  title: 'Stel jouw noodpakket samen – Voorkom verspilling - Noodpakket-op-Maat.nl',
+  meta: [
+    {
+      name: 'description',
+      content: 'Configureer je noodpakket voor 72 uur veiligheid: water, tools, EHBO en meer.',
+    }
+  ]
+})
 import {
   ESSENTIAL_PRODUCTS,
   type EssentialProductKey,

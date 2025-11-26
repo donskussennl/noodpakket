@@ -7,7 +7,20 @@ export default defineNuxtConfig({
   app: {
     head: {
       meta: [
-        { name: 'google-site-verification', content: 'a7MTrBQVFydgpWB6HiuKPdLZZX3oB9Csc5giiHxMiRY' }
+        { name: 'google-site-verification', content: 'a7MTrBQVFydgpWB6HiuKPdLZZX3oB9Csc5giiHxMiRY' },
+        // Open Graph
+        { property: 'og:type', content: 'website' },
+        { property: 'og:site_name', content: 'Noodpakket op Maat' },
+        {
+          property: 'og:image',
+          content: 'https://www.noodpakket-op-maat.nl/images/noodpakket/noodpakket-compleet.jpg'
+        },
+        // Twitter
+        { name: 'twitter:card', content: 'summary_large_image' },
+        {
+          name: 'twitter:image',
+          content: 'https://www.noodpakket-op-maat.nl/images/noodpakket/noodpakket-compleet.jpg'
+        }
       ],
       script: [
         {
