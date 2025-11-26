@@ -4,13 +4,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
-    '@nuxtjs/tailwindcss',
-    '@nuxtjs/google-gtag'
+    '@nuxtjs/tailwindcss'
   ],
-
-  gtag: {
-    id: 'G-W4K1B0FNL2'
-  },
 
   app: {
     head: {

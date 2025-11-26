@@ -1,4 +1,20 @@
 <script setup lang="ts">
+useHead({
+  script: [
+    {
+      src: "https://www.googletagmanager.com/gtag/js?id=G-W4K1B0FNL2",
+      async: true,
+    },
+    {
+      children: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W4K1B0FNL2', { send_page_view: false });
+      `
+    }
+  ]
+})
 const mobileOpen = ref(false)
 
 const closeMobile = () => {
