@@ -96,7 +96,7 @@ const goToCart = () => {
       <section class="space-y-5">
         <div class="w-full rounded-2xl overflow-hidden bg-slate-100">
           <img
-            src="https://www.rodekruis.nl/wp-content/uploads/2022/08/Noodpakket-1310x640-1.jpg"
+            src="/images/noodpakket/noodpakket-compleet.jpg"
             alt="Noodpakket op maat"
             class="w-full h-full object-cover"
           />

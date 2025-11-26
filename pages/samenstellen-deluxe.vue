@@ -130,7 +130,7 @@ const goToCart = () => {
               class="w-full aspect-[4/3] rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 text-sm overflow-hidden"
             >
               <img
-                src="https://www.rodekruis.nl/wp-content/uploads/2022/08/Noodpakket-1310x640-1.jpg"
+                src="/images/noodpakket/noodpakket-compleet.jpg"
                 alt="Noodpakket"
                 class="w-full h-full object-cover"
               />

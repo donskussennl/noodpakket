@@ -11,6 +11,7 @@ export type EssentialProductKey =
   | 'blanket'
   | 'whistle'
   | 'map'
+  | 'touw'
 
 export type BulletType = 'check' | 'cross' | 'dot'
 
@@ -33,7 +34,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'water',
     label: 'Wateropslag',
-    image: '/images/noodpakket/Watertank.png',
+    image: '/images/noodpakket/wateropslag.jpg',
     description:
       'Deze watervoorziening geeft tijdens een noodsituatie direct toegang tot schoon drinkwater. De watervoorziening bevat 72 uur aan drinkwater voor 1 persoon. We passen het aantal watervoorzieningen aan op het aantal personen. Vul deze watervoorziening met kraanwater. Het blijft een jaar houdbaar.',
     bullets: [
@@ -69,7 +70,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'powerbank',
     label: 'Powerbank',
-    image: '/images/noodpakket/ehbo.jpg',
+    image: '/images/noodpakket/powerbank.jpg',
     description:
       'Met deze powerbank blijft je telefoon bereikbaar voor bellen, berichten en informatie. Alles-in-één noodradio’s laden telefoons vaak slechts enkele uren en zeer traag op, daarom kiezen wij bewust voor een aparte powerbank. ',
     bullets: [
@@ -78,22 +79,23 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
       {type: 'check', text: 'Blijf in contact met familie en nooddiensten'}
     ]
   },
-   {
+    {
     id: 'blanket',
     label: 'Deken + kussen',
-    image: '/images/noodpakket/blanket.png',
+    image: '/images/noodpakket/blanket.jpg',
     description:
-      'Blijf warm als de stroom uitvalt of als je moet vluchten. ',
+        'Zorg voor voldoende warmte en comfort bij stroomuitval of een noodsituatie. Voor elk gezinslid hoort één volledige set in het noodpakket te zitten.',
     bullets: [
-      {type: 'check', text: 'Houdt je warm tijdens kou of stroomuitval '},
-      {type: 'check', text: 'Veel comfortabeler dan een goudkleurige nooddeken'},
-      {type: 'check', text: 'Kussen inbegrepen en eenvoudig mee te nemen'}
+        { type: 'check', text: 'Houdt je warm tijdens kou, evacuaties of stroomuitval' },
+        { type: 'check', text: 'Comfortabeler en duurzamer dan een goudkleurige nooddeken' },
+        { type: 'check', text: 'Per persoon één deken en één kussen nodig' }
     ]
-  },
+    },
+
   {
   id: 'map',
   label: 'Plattegrond',
-  image: '/images/noodpakket/map.jpg',
+  image: '/images/noodpakket/kaart.png',
   description:
     'Een fysieke kaart van je woonplaats helpt je navigeren wanneer GPS, internet of telefoons niet werken. Onmisbaar bij evacuaties of noodroutes.',
   bullets: [
@@ -106,7 +108,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'flashlight',
     label: 'Zaklamp',
-    image: '/images/noodpakket/ehbo.jpg',
+    image: '/images/noodpakket/zaklamp.jpg',
     description:
       'Houd je telefoon opgeladen zodat je kunt bellen, berichten sturen en informatie opzoeken.',
     bullets: [
@@ -118,7 +120,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
   id: 'batteries',
   label: 'Batterijen',
-  image: '/images/noodpakket/ehbo.jpg',
+  image: '/images/noodpakket/batterijen.jpg',
   description:
     'Reservebatterijen zorgen ervoor dat je noodradio, zaklamp en andere essentiële apparaten blijven werken tijdens de eerste 72 uur van een noodsituatie.',
   bullets: [
@@ -131,7 +133,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
 {
   id: 'firstaid',
   label: 'EHBO-kit',
-  image: '/images/noodpakket/ehbo.jpg',
+  image: '/images/noodpakket/ehbo-kit.jpg',
   description:
     'Een compacte maar complete EHBO-kit voor kleine verwondingen, snijwonden, blaren of kneuzingen. Handig tijdens evacuaties of stroomstoringen.',
   bullets: [
@@ -143,10 +145,10 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
 },
 {
   id: 'matches',
-  label: 'Lucifers',
-  image: '/images/noodpakket/Lucifers.jpg',
+  label: 'Aansteker',
+  image: '/images/noodpakket/aansteker.jpg',
   description:
-    'Waterdichte lucifers geven je de zekerheid dat je altijd vuur kunt maken voor warmte, licht of noodgebruik.',
+    'Aanstekers geven je de zekerheid dat je altijd vuur kunt maken voor warmte, licht of noodgebruik.',
   bullets: [
     { type: 'check', text: 'Werkt ook zonder stroom of batterijen' },
     { type: 'check', text: 'Handig voor kaarsen, noodkooktoestellen of signaalvuren' },
@@ -156,8 +158,8 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
 },
 {
   id: 'candles',
-  label: 'Kaarsen',
-  image: '/images/noodpakket/Kaarsen.jpg',
+  label: '12 Kaarsen',
+  image: '/images/noodpakket/kaarsen.jpg',
   description:
     'Noodkaarsen geven langdurig licht tijdens stroomuitval en zijn een betrouwbare bron van verlichting zonder batterijen.',
   bullets: [
@@ -180,6 +182,20 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     { type: 'dot',   text: 'Eenvoudig aan je sleutelbos of tas te hangen' }
   ]
 },
+{
+  id: 'touw',
+  label: 'Touw',
+  image: '/images/noodpakket/touw.jpg',
+  description:
+    'Een stevig stuk multifunctioneel touw is onmisbaar in elk noodpakket. Je kunt het gebruiken voor het bevestigen, repareren, vastzetten of optakelen van spullen in uiteenlopende noodsituaties.',
+  bullets: [
+    { type: 'check', text: 'Veelzijdig inzetbaar voor noodreparaties en bevestigingen' },
+    { type: 'check', text: 'Handig voor het opzetten van een tijdelijke shelter of afscherming' },
+    { type: 'check', text: 'Lichtgewicht maar sterk, gemakkelijk mee te nemen' },
+    { type: 'dot',   text: 'Geschikt voor zowel binnen- als buitengebruik' }
+  ]
+}
+
 
 
   // … vul de rest op dezelfde manier aan

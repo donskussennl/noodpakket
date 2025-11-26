@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import VimeoEmbed from '~/components/VimeoEmbed.vue' // Pas dit pad aan indien nodig
+
 useHead({
   title: 'Over ons | noodpakket-op-maat',
   meta: [
@@ -14,7 +16,6 @@ useHead({
 <template>
   <div class="min-h-screen bg-[#FFFDF3] text-slate-900">
     <main class="max-w-5xl mx-auto px-4 md:px-6 py-10 md:py-16 space-y-16">
-      <!-- Hero / Intro -->
       <section class="space-y-6">
         <p class="text-sm font-medium tracking-wide uppercase text-emerald-700">
           Over ons
@@ -29,10 +30,12 @@ useHead({
             zonder onnodige spullen, zonder verspilling, en op basis van wat écht nodig is
             in de eerste 72 uur van een noodsituatie.
           </p>
-        </div>
+
+        
+          </div>
+            <VimeoEmbed videoId="1140837450" title="noodpakket-op-maat" />
       </section>
 
-      <!-- Ons verhaal -->
       <section class="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
         <div class="space-y-4">
           <h2 class="text-xl md:text-2xl font-semibold">Uit frustratie geboren</h2>
@@ -55,7 +58,6 @@ useHead({
           </p>
         </div>
 
-        <!-- Kaartje met Koen & Sjors -->
         <div class="space-y-4">
           <div class="bg-white rounded-3xl border border-slate-200 shadow-soft p-6 space-y-4">
             <h3 class="text-lg font-semibold">Wie wij zijn</h3>
@@ -86,7 +88,6 @@ useHead({
         </div>
       </section>
 
-      <!-- Checklist overheid + hoe we pakketten samenstellen -->
       <section class="space-y-6">
         <h2 class="text-xl md:text-2xl font-semibold">
           Gebaseerd op de checklist van de overheid
@@ -142,7 +143,6 @@ useHead({
         </div>
       </section>
 
-      <!-- Kwaliteit & visie -->
       <section class="space-y-6">
         <h2 class="text-xl md:text-2xl font-semibold">Geen troep, maar kwaliteit</h2>
         <div class="space-y-4 text-sm md:text-base text-slate-800 leading-relaxed">
@@ -165,7 +165,6 @@ useHead({
         </div>
       </section>
 
-      <!-- Kleine afsluitende call-to-action -->
       <section class="pt-6 border-t border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div class="space-y-1">
           <h2 class="text-lg md:text-xl font-semibold">

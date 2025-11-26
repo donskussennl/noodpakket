@@ -29,23 +29,23 @@ interface IntakeState {
   address: Address
 }
 
-const BASE_PRICE = 79
-const FOOD_PACKAGE_PRICE = 29
+const BASE_PRICE = 113.83
+const FOOD_PACKAGE_PRICE = 27.14
 const HYGIENE_PRICES: Record<HygieneOption, number> = {
-  handgel: 3,
-  wcpapier: 3,
-  doekjes: 0.75,
-  tandenborstel: 3,
-  maandverband: 2,
+  handgel: 2.07,
+  wcpapier: 0.63,
+  doekjes: 2.07,
+  tandenborstel: 2.32,
+  maandverband: 2.07,
 }
 const TOOL_PRICES: Record<ToolsOption, number> = {
-  hammer: 12,
-  tang: 7,
-  saw: 9,
-  opener: 3
+  hammer: 7.23,
+  tang: 5.79,
+  saw: 7.23,
+  opener: 3.76
 }
-const PERSON_SURCHARGE = 6      
-const FLIGHTBAG_PRICE = 20        
+const PERSON_SURCHARGE = 24.67      
+const FLIGHTBAG_PRICE = 30.99        
 
 
 export const useIntake = () => {
