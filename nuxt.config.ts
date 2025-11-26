@@ -25,6 +25,7 @@ export default defineNuxtConfig({
           content: 'https://www.noodpakket-op-maat.nl/images/noodpakket/noodpakket-compleet.jpg'
         }
       ]
+
     }
   },
 
@@ -36,4 +37,4 @@ export default defineNuxtConfig({
     resendApiKey: process.env.RESEND_API_KEY,
     emailFrom: process.env.EMAIL_FROM || 'no-reply@noodpakket-op-maat.nl',
   }
-})
+});
