@@ -47,7 +47,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'radio',
     label: 'FM-Noodradio',
-    image: '/images/noodpakket/Noodradio.jpg',
+    image: '/images/noodpakket/Noodradio.png',
     description:
       `Met deze noodradio blijf je op de hoogte van belangrijke berichten van overheid en hulpdiensten. Kies voor een Noodradio op batterijen i.p.v. een opwendbare variant zodat je tijdens die 72 uur altijd toegang hebt tot de noodzenders!* `,
     bullets: [
