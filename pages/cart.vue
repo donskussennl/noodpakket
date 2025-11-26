@@ -23,6 +23,8 @@ const toolsTotal = computed(() => {
     return sum + TOOL_PRICES[item as keyof typeof TOOL_PRICES]
   }, 0)
 })
+const personsCount = computed(() => intake.value.persons || 1)
+
 
 const hygieneLabels: Record<string, string> = {
   handgel: 'Handgel',
@@ -155,17 +157,15 @@ const goToCheckout = () => {
             <div class="pt-2 border-t border-slate-200">
               <span class="block text-slate-500 mb-1">Noodpakket basis</span>
               <ul class="text-xs text-slate-600 space-y-1">
-           
-                  <li>• Noodradio</li>
-                  <li>• Watervoorziening voor {{ intake.persons }} personen</li>
-                  <li>• EHBO-set</li>
-                  <li>• Deken</li>
-                  <li>• Kussen</li>
-                  <li>• Zaklamp</li>
-                  <li>• Batterijen</li>
-                  <li>• Powerbank</li>
+                <li>• Noodradio</li>
+                <li>• {{ personsCount }}x Wateropslag</li>
+                <li>• EHBO-kit</li>
+                <li>• {{ personsCount }}x Deken + kussen</li>
+                <li>• Zaklamp</li>
+                <li>• Batterijen</li>
+                <li>• Powerbank</li>
+            </ul>
 
-              </ul>
             </div>
 
             <div v-if="Array.isArray(intake.hygiene) && intake.hygiene.length" class="pt-2 border-t border-slate-200">

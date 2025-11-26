@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ESSENTIAL_PRODUCTS, type EssentialProductKey } from '~/data/essentialProducts'
+import {
+  ESSENTIAL_PRODUCTS,
+  type EssentialProductKey,
+  type EssentialProduct
+} from '~/data/essentialProducts'
+
 
 const showEssentialInfo = ref(false)
 const selectedEssentialKey = ref<EssentialProductKey | null>(null)
@@ -106,6 +111,22 @@ const goToCart = () => {
   calculatePrice()
   navigateTo('/cart')
 }
+
+const getProductLabel = (product?: EssentialProduct | null) => {
+  if (!product) return ''
+
+  const persons = intake.value.persons || 1
+  const shouldMultiply = product.id === 'water' || product.id === 'blanket'
+
+  // Alleen "2x / 3x ..." tonen als er meer dan 1 persoon is
+  if (shouldMultiply && persons > 1) {
+    return `${persons}x ${product.label}`
+  }
+
+  // Bij 1 persoon blijft het oude label
+  return product.label
+}
+
 </script>
 
 <template>
@@ -231,7 +252,7 @@ const goToCart = () => {
                   @click="openEssentialProduct(product.id)"
                 >
                   <span class="font-medium text-slate-900">
-                    {{ product.label }}
+                    {{ getProductLabel(product) }}
                   </span>
 
                   <!-- kleine hint dat het klikbaar is -->
@@ -826,7 +847,7 @@ const goToCart = () => {
   <div class="bg-white rounded-2xl max-w-md w-full mx-4 p-6 space-y-4 shadow-lg">
     <div class="flex items-start justify-between gap-4">
       <h3 class="text-lg font-semibold text-slate-900">
-        {{ selectedEssentialProduct.label }}
+        {{ getProductLabel(selectedEssentialProduct) }}
       </h3>
       <button
         type="button"

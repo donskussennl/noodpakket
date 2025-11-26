@@ -21,7 +21,15 @@ const ALL_HYGIENE: HygieneOption[] = [
   'tandenborstel',
   'maandverband',
 ]
+const showVideoModal = ref(false)
 
+const openVideoModal = () => {
+  showVideoModal.value = true
+}
+
+const closeVideoModal = () => {
+  showVideoModal.value = false
+}
 const ALL_TOOLS: ToolsOption[] = ['hammer', 'tang', 'saw', 'opener']
 
 const hygieneChoice = ref<'pakket' | 'geen'>('geen')
@@ -114,6 +122,43 @@ const goToCart = () => {
             Je kiest zelf hoeveel personen, of je een vluchttas wilt en of we hygiëne en
             noodgereedschap voor je meenemen.
           </p>
+
+           <!-- Uitlegvideo trigger -->
+        <div class="mt-3">
+          <button
+            type="button"
+            @click="openVideoModal"
+            class="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm hover:border-emerald-500 hover:bg-emerald-50 hover:shadow-md transition"
+          >
+            <!-- Thumbnail met play-icoon -->
+            <div class="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-200 flex items-center justify-center">
+              <!-- Gebruik hier je eigen thumbnail -->
+              <img
+                src="/images/noodpakket/uitlegvideo-thumb.png"
+                alt="Uitlegvideo noodpakket"
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-black/30"></div>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span
+                  class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/90 text-sm font-semibold"
+                >
+                  ▶
+                </span>
+              </div>
+            </div>
+
+            <!-- Tekst -->
+            <div class="flex flex-col items-start text-left">
+              <span class="text-sm font-medium text-slate-900">
+                Bekijk uitlegvideo
+              </span>
+              <span class="text-xs text-slate-600">
+                In 2 minuten weet je precies wat je krijgt
+              </span>
+            </div>
+          </button>
+        </div>
         </div>
 
         <div class="flex items-baseline justify-between pt-3 border-t border-slate-200">
@@ -317,4 +362,43 @@ const goToCart = () => {
       </section>
     </div>
   </div>
+  <!-- Modal: uitlegvideo -->
+<div
+  v-if="showVideoModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+  @click.self="closeVideoModal"
+>
+  <div class="bg-white rounded-2xl max-w-3xl w-full mx-4 p-4 md:p-6 space-y-4 shadow-lg">
+    <div class="flex items-start justify-between gap-4">
+      <h3 class="text-lg font-semibold text-slate-900">
+        Uitlegvideo noodpakket
+      </h3>
+      <button
+        type="button"
+        class="text-slate-400 hover:text-slate-600"
+        @click="closeVideoModal"
+        aria-label="Sluiten"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Vimeo embed via bestaand component -->
+    <VimeoEmbed videoId="1140837450" title="noodpakket-op-maat" />
+
+    <p class="text-sm text-slate-700">
+      In deze video laten we je zien wat er in het noodpakket zit en hoe je het het beste kunt gebruiken.
+    </p>
+
+    <div class="pt-2 flex justify-end">
+      <button
+        type="button"
+        class="inline-flex items-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+        @click="closeVideoModal"
+      >
+        Begrijp ik
+      </button>
+    </div>
+  </div>
+</div>
 </template>
