@@ -2,33 +2,35 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss'],
+
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/google-gtag'
+  ],
+
+  gtag: {
+    id: 'G-W4K1B0FNL2'
+  },
 
   app: {
     head: {
       meta: [
         { name: 'google-site-verification', content: 'a7MTrBQVFydgpWB6HiuKPdLZZX3oB9Csc5giiHxMiRY' },
-        // Open Graph
+
+        // Open Graph defaults
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: 'Noodpakket op Maat' },
         {
           property: 'og:image',
           content: 'https://www.noodpakket-op-maat.nl/images/noodpakket/noodpakket-compleet.jpg'
         },
-        // Twitter
         { name: 'twitter:card', content: 'summary_large_image' },
         {
           name: 'twitter:image',
           content: 'https://www.noodpakket-op-maat.nl/images/noodpakket/noodpakket-compleet.jpg'
         }
-      ],
-      script: [
-        {
-          src: 'https://www.googletagmanager.com/gtag/js?id=G-W4K1B0FNL2',
-          async: true,
-        },
-      ],
-    },
+      ]
+    }
   },
 
   runtimeConfig: {
@@ -38,5 +40,5 @@ export default defineNuxtConfig({
 
     resendApiKey: process.env.RESEND_API_KEY,
     emailFrom: process.env.EMAIL_FROM || 'no-reply@noodpakket-op-maat.nl',
-  },
+  }
 })
