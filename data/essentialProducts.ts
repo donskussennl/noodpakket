@@ -106,17 +106,18 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   ]
 },
   {
-    id: 'flashlight',
-    label: 'Zaklamp',
-    image: '/images/noodpakket/zaklamp.jpg',
-    description:
-      'Houd je telefoon opgeladen zodat je kunt bellen, berichten sturen en informatie opzoeken.',
-    bullets: [
-      { type: 'check', text: 'Werkt op batterijen' },
-      { type: 'check', text: 'Werkt op batterijen' },
-      { type: 'check', text: 'Werkt op batterijen' },
-    ]
-  },
+  id: 'flashlight',
+  label: 'Zaklamp',
+  image: '/images/noodpakket/zaklamp.jpg',
+  description:
+    'Een betrouwbare zaklamp is essentieel bij stroomuitval of wanneer je in het donker je weg moet vinden.',
+  bullets: [
+    { type: 'check', text: 'Werkt op batterijen of is op te laden' },
+    { type: 'check', text: 'Lange brandduur' },
+    { type: 'check', text: 'Sterke, heldere lichtbundel' }
+  ]
+},
+
   {
   id: 'batteries',
   label: 'Batterijen',

@@ -642,7 +642,7 @@ const getProductLabel = (product?: EssentialProduct | null) => {
                   <span class="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
                 </summary>
                 <p class="mt-3 text-sm text-slate-700">
-                  Bestellingen kunnen binnen 30 dagen worden gewijzigd of geretourneerd, zolang de
+                  Bestellingen kunnen binnen 30 dagen worden geretourneerd, zolang de
                   producten ongebruikt zijn.
                 </p>
               </details>
