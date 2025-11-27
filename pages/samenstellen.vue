@@ -8,13 +8,15 @@ useHead({
     }
   ]
 })
-import {
-  ESSENTIAL_PRODUCTS,
-  type EssentialProductKey,
-  type EssentialProduct
-} from '~/data/essentialProducts'
 
+import { ESSENTIAL_PRODUCTS, type EssentialProductKey, type EssentialProduct } from '~/data/essentialProducts'
+import { useAnalytics } from '~/composables/useAnalytics'
 
+const { trackEvent } = useAnalytics()
+
+// -------------------------
+//   ESSENTIAL PRODUCTS
+// -------------------------
 const showEssentialInfo = ref(false)
 const selectedEssentialKey = ref<EssentialProductKey | null>(null)
 
@@ -23,25 +25,37 @@ const selectedEssentialProduct = computed(() => {
 })
 
 const openEssentialProduct = (key: EssentialProductKey) => {
+  trackEvent('view_essential_product', {
+    product_id: key
+  })
   selectedEssentialKey.value = key
   showEssentialInfo.value = true
 }
 
 const closeEssentialProduct = () => {
+  trackEvent('close_essential_modal')
   showEssentialInfo.value = false
   selectedEssentialKey.value = null
 }
+
+// -------------------------
+//   UITLEGVIDEO
+// -------------------------
 const showVideoModal = ref(false)
 
 const openVideoModal = () => {
+  trackEvent('click_video', { location: 'hero' })
   showVideoModal.value = true
 }
 
 const closeVideoModal = () => {
+  trackEvent('close_video')
   showVideoModal.value = false
 }
 
-
+// -------------------------
+//   INTAKE SYSTEEM
+// -------------------------
 const {
   intake,
   calculatePrice,
@@ -53,54 +67,57 @@ const {
 } = useIntake()
 
 const showPersonsInfo = ref(false)
-
 const showPackageInfo = ref(false)
-
 const showToolsInfo = ref(false)
 
-// helpers voor multi-select hygiene/tools
+// -------------------------
+//   HYGIENE
+// -------------------------
 const toggleHygiene = (option: string) => {
+  trackEvent('toggle_hygiene', { hygiene: option })
   const list = intake.value.hygiene || []
-  if (list.includes(option)) {
-    intake.value.hygiene = list.filter((o) => o !== option)
-  } else {
-    intake.value.hygiene = [...list, option]
-  }
+  intake.value.hygiene = list.includes(option)
+    ? list.filter((o) => o !== option)
+    : [...list, option]
 }
 
 const clearHygiene = () => {
+  trackEvent('clear_hygiene')
   intake.value.hygiene = []
 }
 
 const hasHygiene = (option: string) =>
   Array.isArray(intake.value.hygiene) && intake.value.hygiene.includes(option)
 
+// -------------------------
+//   TOOLS
+// -------------------------
 const toggleTool = (option: string) => {
+  trackEvent('toggle_tool', { tool: option })
   const list = intake.value.tools || []
-  if (list.includes(option)) {
-    intake.value.tools = list.filter((o) => o !== option)
-  } else {
-    intake.value.tools = [...list, option]
-  }
+  intake.value.tools = list.includes(option)
+    ? list.filter((o) => o !== option)
+    : [...list, option]
 }
 
 const clearTools = () => {
+  trackEvent('clear_tools')
   intake.value.tools = []
 }
 
 const hasTool = (option: string) =>
   Array.isArray(intake.value.tools) && intake.value.tools.includes(option)
 
-// init defaults & prijs
+// -------------------------
+//   mounted + watchers
+// -------------------------
 onMounted(() => {
-  // standaard: water op aantal personen, tenzij al gezet
   if (intake.value.waterBags == null) {
     intake.value.waterBags = intake.value.persons || 1
   }
   calculatePrice()
 })
 
-// prijs automatisch updaten bij wijzigingen
 watch(
   () => [
     intake.value.persons,
@@ -116,27 +133,42 @@ watch(
   { deep: true }
 )
 
+// -------------------------
+//   ADD TO CART
+// -------------------------
 const goToCart = () => {
   calculatePrice()
+
+  // 🔥 GA4: Add to cart event
+  trackEvent('add_to_cart', {
+    price: intake.value.price || BASE_PRICE,
+    persons: intake.value.persons,
+    foodInventory: intake.value.foodInventory,
+    hygiene: intake.value.hygiene,
+    tools: intake.value.tools,
+    flightbag: intake.value.flightbag
+  })
+
   navigateTo('/cart')
 }
 
+// -------------------------
+//   Labels
+// -------------------------
 const getProductLabel = (product?: EssentialProduct | null) => {
   if (!product) return ''
 
   const persons = intake.value.persons || 1
   const shouldMultiply = product.id === 'water' || product.id === 'blanket'
 
-  // Alleen "2x / 3x ..." tonen als er meer dan 1 persoon is
   if (shouldMultiply && persons > 1) {
     return `${persons}x ${product.label}`
   }
 
-  // Bij 1 persoon blijft het oude label
   return product.label
 }
-
 </script>
+
 
 <template>
   <div class="min-h-screen bg-[#FFFDF3] text-slate-900">

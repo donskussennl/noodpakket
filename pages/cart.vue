@@ -1,4 +1,8 @@
 <script setup lang="ts">
+onMounted(() => {
+  trackEvent('begin_checkout')
+})
+
 const {
   intake,
   calculatePrice,
