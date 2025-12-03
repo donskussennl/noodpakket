@@ -38,7 +38,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Wateropslag',
     image: '/images/noodpakket/wateropslag.png',
     description: 'Deze watervoorziening geeft tijdens een noodsituatie direct toegang tot schoon drinkwater. De watervoorziening bevat 72 uur aan drinkwater voor 1 persoon.',
-    price: 9.50,
+    price: 9.90,
     subLabel: '9 liter',
     multiplies: true,
     bullets: [
@@ -53,7 +53,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'FM-Noodradio',
     image: '/images/noodpakket/Noodradio.png',
     description: `Met deze noodradio blijf je op de hoogte van belangrijke berichten van overheid en hulpdiensten.`,
-    price: 24.95,
+    price: 23.06,
     subLabel: 'op AAA-batterijen',
     multiplies: false,
     bullets: [
@@ -67,7 +67,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Powerbank',
     image: '/images/noodpakket/powerbank.png',
     description: 'Met deze powerbank blijft je telefoon bereikbaar voor bellen, berichten en informatie.',
-    price: 19.99,
+    price: 21.32,
     subLabel: '3x je telefoon opladen',
     multiplies: false,
     bullets: [
@@ -81,7 +81,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Deken + kussen',
     image: '/images/noodpakket/blanket.png',
     description: 'Zorg voor voldoende warmte en comfort bij stroomuitval of een noodsituatie.',
-    price: 12.50,
+    price: 9.83,
     subLabel: 'Extra warm',
     multiplies: true,
     bullets: [
@@ -95,7 +95,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Plattegrond',
     image: '/images/noodpakket/kaart.png',
     description: 'Een fysieke kaart van je woonplaats helpt je navigeren wanneer GPS, internet of telefoons niet werken.',
-    price: 7.50,
+    price: 0.50,
     subLabel: 'van je woonplaats',
     multiplies: false,
     bullets: [
@@ -109,7 +109,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Zaklamp',
     image: '/images/noodpakket/zaklamp.png',
     description: 'Een betrouwbare zaklamp is essentieel bij stroomuitval.',
-    price: 9.95,
+    price: 1.65,
     subLabel: 'op AAA-batterijen',
     multiplies: false,
     bullets: [
@@ -123,7 +123,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'AAA Batterijen',
     image: '/images/noodpakket/batterijen.png',
     description: 'Reservebatterijen zorgen ervoor dat je noodradio en zaklamp blijven werken.',
-    price: 4.95,
+    price: 3.80,
     subLabel: '10 stuks',
     multiplies: false,
     bullets: [
@@ -137,7 +137,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'EHBO-kit',
     image: '/images/noodpakket/ehbo-kit.png',
     description: 'Een compacte maar complete EHBO-kit voor kleine verwondingen.',
-    price: 14.95,
+    price: 8.26,
     subLabel: 'O.a. Pleister, gaas, tape en verband.',
     multiplies: false,
     bullets: [
@@ -151,7 +151,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Aanstekers',
     image: '/images/noodpakket/aansteker.png',
     description: 'Aanstekers geven je de zekerheid dat je altijd vuur kunt maken.',
-    price: 2.50,
+    price: 1.40,
     subLabel: '3 stuks',
     multiplies: false,
     bullets: [
@@ -164,7 +164,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Kaarsen',
     image: '/images/noodpakket/kaarsen.png',
     description: 'Noodkaarsen geven langdurig licht tijdens stroomuitval.',
-    price: 6.95,
+    price: 0.72,
     subLabel: '12 stuks',
     multiplies: false,
     bullets: [
@@ -178,7 +178,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Noodfluitje',
     image: '/images/noodpakket/Fluit.png',
     description: 'Met een noodfluitje kun je jezelf hoorbaar maken.',
-    price: 3.50,
+    price: 3.80,
     subLabel: 'Metaal',
     multiplies: false,
     bullets: [
@@ -191,7 +191,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Touw',
     image: '/images/noodpakket/touw.png',
     description: 'Een stevig stuk multifunctioneel touw is onmisbaar.',
-    price: 4.50,
+    price: 3.31,
     subLabel: '100 meter',
     multiplies: false,
     bullets: [

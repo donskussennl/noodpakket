@@ -19,8 +19,7 @@
 
           <!-- Desktop navigatie -->
           <nav class="hidden md:flex items-center gap-6 text-sm">
-            <NuxtLink class="hover:text-emerald-600" to="/samenstellen">Noodpakket samenstellen</NuxtLink>
-            <NuxtLink class="hover:text-emerald-600" to="/samenstellen-deluxe">Noodpakket compleet</NuxtLink>
+            <NuxtLink class="hover:text-emerald-600" to="/samenstellen">Noodpakket compleet</NuxtLink>
             <NuxtLink class="hover:text-emerald-600" to="/wees-voorbereid">Bereid je voor</NuxtLink>
             <NuxtLink class="hover:text-emerald-600" to="/cart">Winkelwagen</NuxtLink>
             <NuxtLink class="hover:text-emerald-600" to="/contact">Contact</NuxtLink>

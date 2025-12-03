@@ -170,6 +170,14 @@ onMounted(() => {
 
   calculatePrice()
 })
+// NIEUWE WATCHER: Kijkt naar ALLES in intake
+watch(
+  intake,
+  () => {
+    calculatePrice()
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -179,10 +187,7 @@ onMounted(() => {
       <header class="space-y-2 mb-8 md:mb-10">
         <div class="space-y-1">
           <p class="text-sm font-medium tracking-wide uppercase text-emerald-700"> Meer dan 5,5 miljoen Nederlanders zijn al voorbereid </p>
-          <h1 class="text-xl md:text-3xl font-semibold">Noodpakket compleet</h1>
-          <p class="text-base md:text-xl text-slate-800">
-            Bereid je huishouden voor op een noodgeval.
-          </p>
+          <h1 class="text-xl md:text-3xl font-semibold">Noodpakket compleet op basis van de checklist van de overheid</h1>
         </div>
         
         <div class="mt-3 md:hidden">
@@ -262,29 +267,6 @@ onMounted(() => {
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-100">
               
-              <div class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
-                <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img src="/images/noodpakket/voedselpakket-nood.png" alt="Noodvoedsel" class="w-full h-full object-cover mix-blend-multiply" />
-                </div>
-                <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-                  <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="showPersonsInfo = true">
-                    Noodvoedselpakket ({{ intake.persons }} pers.) ›
-                  </button>
-                  
-                  <div class="text-sm text-slate-500 line-clamp-1">
-                    2400 kcal per dag
-                  </div>
-
-                  <div class="text-sm font-medium text-slate-900">
-                    {{ formatPriceDot(FOOD_PACKAGE_PRICE * intake.persons) }}
-                  </div>
-                </div>
-                <div class="shrink-0 pr-1">
-                  <button type="button" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors focus:outline-none" :class="isFoodSelected ? 'bg-emerald-700 border-emerald-700' : 'bg-white border-slate-200'" @click="toggleFood">
-                    <svg v-if="isFoodSelected" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                  </button>
-                </div>
-              </div>
 
               <div class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
                 <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
@@ -358,84 +340,6 @@ onMounted(() => {
             </div>
           </section>
 
-          <section class="space-y-4">
-            <div class="space-y-1">
-              <h2 class="text-xl md:text-2xl font-semibold">Uit je eigen huis</h2>
-              <p class="text-sm text-slate-600">Vaak heb je deze spullen al, maar zijn ze verspreid.</p>
-            </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-100">
-              
-              <div class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
-                <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img src="/images/noodpakket/hamer.png" alt="Hamer" class="w-full h-full object-cover mix-blend-multiply" />
-                </div>
-                <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-                  <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="showToolsInfo = true">
-                    Hamer ›
-                  </button>
-                  
-                  <div class="text-sm text-slate-500 line-clamp-1">
-                    Klauwhamer
-                  </div>
-
-                  <div class="text-sm font-medium text-slate-900">
-                    {{ formatPriceDot(TOOL_PRICES['hammer']) }}
-                  </div>
-                </div>
-                <div class="shrink-0 pr-1">
-                  <button type="button" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors focus:outline-none" :class="isToolSelected('hammer') ? 'bg-emerald-700 border-emerald-700' : 'bg-white border-slate-200'" @click="toggleTool('hammer')">
-                    <svg v-if="isToolSelected('hammer')" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                  </button>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
-                <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img src="/images/noodpakket/zaag.png" alt="Zaag" class="w-full h-full object-cover mix-blend-multiply" />
-                </div>
-                <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-                  <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="showToolsInfo = true">
-                    Zaag ›
-                  </button>
-                  
-                  <div class="text-sm text-slate-500 line-clamp-1">
-                    Handzaag (hout)
-                  </div>
-
-                  <div class="text-sm font-medium text-slate-900">
-                    {{ formatPriceDot(TOOL_PRICES['saw']) }}
-                  </div>
-                </div>
-                <div class="shrink-0 pr-1">
-                  <button type="button" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors focus:outline-none" :class="isToolSelected('saw') ? 'bg-emerald-700 border-emerald-700' : 'bg-white border-slate-200'" @click="toggleTool('saw')">
-                    <svg v-if="isToolSelected('saw')" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                  </button>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
-                <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img src="/images/noodpakket/hygiene-producten.png" alt="Hygiëne" class="w-full h-full object-cover mix-blend-multiply" />
-                </div>
-                <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-                  <span class="text-left text-[15px] font-semibold text-slate-900 truncate">Hygiëne bundel</span>
-                  
-                  <div class="text-sm text-slate-500 line-clamp-1">
-                    Gel, wc-papier, doekjes, tandverzorging, verband
-                  </div>
-
-                  <div class="text-sm font-medium text-slate-900">
-                    {{ formatPriceDot(hygieneBundlePrice) }}
-                  </div>
-                </div>
-                <div class="shrink-0 pr-1">
-                  <button type="button" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors focus:outline-none" :class="isHygieneBundleSelected ? 'bg-emerald-700 border-emerald-700' : 'bg-white border-slate-200'" @click="toggleHygieneBundle">
-                    <svg v-if="isHygieneBundleSelected" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
 
           <section class="mt-20 space-y-8">
             <h2 class="text-xl md:text-2xl font-semibold">Veelgestelde vragen</h2>
@@ -465,7 +369,7 @@ onMounted(() => {
           </div>
           <div class="text-xs font-medium text-slate-500">Totaal: <span class="text-slate-900">€ {{ formatPriceDot(intake.price) }}</span></div>
         </div>
-        <button type="button" class="flex-1 md:flex-none md:min-w-[200px] inline-flex justify-center items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-base font-bold text-white shadow-md hover:bg-emerald-700 transition active:scale-95" @click="goToCart">Toevoegen</button>
+        <button type="button" class="flex-1 md:flex-none md:min-w-[200px] inline-flex justify-center items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-base font-bold text-white shadow-md hover:bg-emerald-700 transition active:scale-95" @click="goToCart">In winkelmandje</button>
       </div>
     </div>
 
@@ -514,7 +418,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 20px);
+.safe-area-padding {
+  padding-bottom: 12px; /* Default padding */
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
 }
 </style>

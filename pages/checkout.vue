@@ -8,7 +8,9 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 
 // Helper voor prijs weergave
-const formatPrice = (price: number) => price.toFixed(2)
+const formatPrice = (price: number) => {
+  return price.toFixed(2).replace('.', ',')
+}
 
 // Zorg dat prijs berekend is bij laden
 onMounted(() => {
@@ -79,7 +81,7 @@ const pay = async () => {
       <section class="mb-10 bg-slate-50 border border-slate-200 rounded-2xl p-6">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
           <div>
-            <span class="block text-sm text-slate-500 mb-1">Totaal te betalen</span>
+            <span class="block text-sm text-slate-500 mb-1">Totale bestelling</span>
             <span class="text-3xl font-bold text-slate-900">€ {{ formatPrice(intake.price) }}</span>
           </div>
           
@@ -209,7 +211,7 @@ const pay = async () => {
             type="button"
             @click="pay"
           >
-            <span v-if="!loading">Betalen en afronden</span>
+            <span v-if="!loading">Bestelling plaatsen en betalen</span>
             <span v-else>Even geduld...</span>
           </button>
 

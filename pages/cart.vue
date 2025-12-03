@@ -35,6 +35,10 @@ const touchCurrentId = ref<string | null>(null)
 // --- Helpers ---
 const formatPrice = (price: number) => price.toFixed(2)
 
+const formatPriceKomma = (price: number) => {
+  return price.toFixed(2).replace('.', ',')
+}
+
 // Helper om aantallen te tellen in een array
 const countOccurrences = (arr: string[]) => {
   return arr.reduce((acc, curr) => {
@@ -287,7 +291,7 @@ watch(intake, () => calculatePrice(), { deep: true })
   <div class="min-h-screen pb-32">
     <div class="sticky top-0 z-30  backdrop-blur-sm border-b border-slate-100">
       <div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-        <h1 class="text-lg font-semibold text-slate-900">Winkelmandje</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Winkelmandje</h1>
         <NuxtLink to="/samenstellen-deluxe" class="text-sm font-medium text-emerald-600">
           Aanpassen
         </NuxtLink>
@@ -413,7 +417,7 @@ watch(intake, () => calculatePrice(), { deep: true })
           class="w-full group relative flex items-center justify-between bg-emerald-600 hover:bg-emerald-700 text-white text-base font-bold py-3.5 px-5 rounded-full shadow-md transition-all active:scale-[0.98]"
           @click="goToCheckout"
         >
-          <span>Doorgaan naar bestellen</span>
+          <span>Ik ga bestellen</span>
           <div class="flex items-center gap-2">
             <span class="bg-black/10 px-2 py-0.5 rounded text-white group-hover:bg-black/20 transition-colors">
               € {{ formatPrice(intake.price) }}
@@ -427,7 +431,8 @@ watch(intake, () => calculatePrice(), { deep: true })
 </template>
 
 <style scoped>
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 20px);
+.safe-area-padding {
+  padding-bottom: 16px; /* Default padding */
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
 }
 </style>

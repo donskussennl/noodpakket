@@ -23,7 +23,7 @@ interface IntakeState {
   flightbag: Flightbag | null
   foodInventory: FoodInventory | null
   
-  // Nieuw: bijhouden welke essentials aan staan
+  // Lijst met IDs. Mag dubbele waarden bevatten (bijv. ['radio', 'radio'] = 2 radio's)
   selectedEssentials: EssentialProductKey[]
 
   hygiene: HygieneOption[] | []
@@ -33,22 +33,23 @@ interface IntakeState {
   address: Address
 }
 
-// Prijzen voor optionele items
-const FOOD_PACKAGE_PRICE = 27.14
-const FLIGHTBAG_PRICE = 30.99        
+// Prijzen configuratie
+const FOOD_PACKAGE_PRICE = 15.51
+const FLIGHTBAG_PRICE = 24.79        
 
 const HYGIENE_PRICES: Record<HygieneOption, number> = {
-  handgel: 2.07,
+  handgel: 1.65,
   wcpapier: 0.63,
-  doekjes: 2.07,
-  tandenborstel: 2.32,
-  maandverband: 2.07,
+  doekjes: 1.65,
+  tandenborstel: 1.65,
+  maandverband: 1.00,
 }
+
 const TOOL_PRICES: Record<ToolsOption, number> = {
-  hammer: 7.23,
-  tang: 5.79,
-  saw: 7.23,
-  opener: 3.76
+  hammer: 5.79,
+  tang: 4.63,
+  saw: 5.78,
+  opener: 3.01
 }
 
 export const useIntake = () => {
@@ -56,7 +57,7 @@ export const useIntake = () => {
     persons: 1,
     foodInventory: 'inhouse',
     
-    // Standaard alles geselecteerd
+    // Standaard vullen we dit met 1x elk essentieel product
     selectedEssentials: ESSENTIAL_PRODUCTS.map(p => p.id),
 
     hygiene: [],
@@ -82,14 +83,16 @@ export const useIntake = () => {
     const persons = intake.value.persons ?? 1
 
     // 1. Essentials berekenen
-    // Sommige producten (water, deken) gaan x personen, andere zijn 1x per pakket
+    // We itereren over de array. Als een ID er 2x in staat, wordt de prijs 2x opgeteld.
     if (intake.value.selectedEssentials) {
       intake.value.selectedEssentials.forEach(id => {
         const product = ESSENTIAL_PRODUCTS.find(p => p.id === id)
         if (product) {
           if (product.multiplies) {
+            // Producten zoals water/dekens schalen mee met aantal personen
             price += product.price * persons
           } else {
+            // Producten zoals radio zijn vaste prijs per stuk
             price += product.price
           }
         }
@@ -104,7 +107,8 @@ export const useIntake = () => {
     // 3. Hygiëne → som van individuele prijzen
     if (Array.isArray(intake.value.hygiene)) {
       const hygieneTotal = intake.value.hygiene.reduce((sum, item) => {
-        return sum + HYGIENE_PRICES[item]
+        // De '|| 0' zorgt dat het niet crasht als er een oude ID in staat
+        return sum + (HYGIENE_PRICES[item] || 0)
       }, 0)
       price += hygieneTotal
     }
@@ -112,7 +116,7 @@ export const useIntake = () => {
     // 4. Tools → som van individuele prijzen
     if (Array.isArray(intake.value.tools)) {
       const toolsTotal = intake.value.tools.reduce((sum, item) => {
-        return sum + TOOL_PRICES[item]
+        return sum + (TOOL_PRICES[item] || 0)
       }, 0)
       price += toolsTotal
     }
