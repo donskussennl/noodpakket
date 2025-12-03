@@ -543,43 +543,17 @@ watch(
       </div>
     </div>
 
-    <div class="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 safe-area-padding">
-      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        
-        <div class="flex flex-col justify-center gap-1">
-          <div class="flex items-center gap-3 bg-slate-100 rounded-xl p-1">
-            <button 
-              @click="decreasePersons" 
-              class="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-slate-700 shadow-sm font-bold text-xl hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              :disabled="intake.persons <= 1"
-            >
-              −
-            </button>
-            
-            <span class="text-base font-semibold text-slate-900 w-20 text-center tabular-nums leading-none select-none">
-              {{ intake.persons }} {{ intake.persons === 1 ? 'pers.' : 'pers.' }}
-            </span>
-
-            <button 
-              @click="increasePersons" 
-              class="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-slate-700 shadow-sm font-bold text-xl hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              :disabled="intake.persons >= 10"
-            >
-              +
-            </button>
+    <div class="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 p-4 safe-area-bottom">
+      <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+        <div class="flex flex-col items-center gap-1">
+          <div class="flex items-center gap-3">
+            <button @click="decreasePersons" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors" :class="{'opacity-50 cursor-not-allowed': intake.persons <= 1}" :disabled="intake.persons <= 1">−</button>
+            <span class="text-base font-semibold text-slate-900 min-w-[4.5rem] text-center">{{ intake.persons }} {{ intake.persons === 1 ? 'persoon' : 'personen' }}</span>
+            <button @click="increasePersons" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors" :class="{'opacity-50 cursor-not-allowed': intake.persons >= 10}" :disabled="intake.persons >= 10">+</button>
           </div>
-          <div class="text-xs font-medium text-slate-500 text-center">
-            Totaal: <span class="text-slate-900">€ {{ formatPriceDot(intake.price) }}</span>
-          </div>
+          <div class="text-xs font-medium text-slate-500">Totaal: <span class="text-slate-900">€ {{ formatPriceDot(intake.price) }}</span></div>
         </div>
-        
-        <button 
-          type="button" 
-          class="flex-1 md:flex-none md:min-w-[220px] h-12 inline-flex justify-center items-center gap-2 rounded-full bg-emerald-600 px-6 text-base font-bold text-white shadow-md hover:bg-emerald-700 transition active:scale-95" 
-          @click="goToCart"
-        >
-          In winkelmandje
-        </button>
+        <button type="button" class="flex-1 md:flex-none md:min-w-[200px] inline-flex justify-center items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-base font-bold text-white shadow-md hover:bg-emerald-700 transition active:scale-95" @click="goToCart">In winkelmandje</button>
       </div>
     </div>
 

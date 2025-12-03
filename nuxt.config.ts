@@ -22,6 +22,11 @@ export default defineNuxtConfig({
           name: 'twitter:image',
           content: 'https://www.noodpakket-op-maat.nl/images/noodpakket/noodpakket-compleet.jpg'
         }
+      ],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+        // Of als je een png hebt in je public map:
+        // { rel: 'icon', type: 'image/png', href: '/jouw-logo.png' }
       ]
 
     }
