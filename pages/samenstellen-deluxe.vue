@@ -296,7 +296,7 @@ watch(
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="showToolsInfo = true">
-                    Blikopener ›
+                    Blikopener
                   </button>
                   
                   <div class="text-sm text-slate-500 line-clamp-1">
@@ -320,7 +320,7 @@ watch(
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="showToolsInfo = true">
-                    Kniptang ›
+                    Kniptang
                   </button>
                   
                   <div class="text-sm text-slate-500 line-clamp-1">
