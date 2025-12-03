@@ -51,7 +51,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'radio',
     label: 'FM-Noodradio',
-    image: '/images/noodpakket/Noodradio.png',
+    image: '/images/noodpakket/noodradio.png',
     description: `Met deze noodradio blijf je op de hoogte van belangrijke berichten van overheid en hulpdiensten.`,
     price: 23.06,
     subLabel: 'op AAA-batterijen',
@@ -176,7 +176,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'whistle',
     label: 'Noodfluitje',
-    image: '/images/noodpakket/Fluit.png',
+    image: '/images/noodpakket/fluit.png',
     description: 'Met een noodfluitje kun je jezelf hoorbaar maken.',
     price: 3.80,
     subLabel: 'Metaal',
