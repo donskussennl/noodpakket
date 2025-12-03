@@ -830,6 +830,29 @@ const getProductLabel = (product?: EssentialProduct | null) => {
         </div>
       </div>
     </div>
+      <!-- Mobiele sticky bar onderin -->
+  <div
+    class="fixed inset-x-0 bottom-0 z-30 md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-sm"
+  >
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex flex-col">
+        <span class="text-xs text-slate-500">Totaal</span>
+        <span class="text-base font-semibold text-slate-900">
+          € {{ (intake.price || BASE_PRICE).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        class="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-700"
+        @click="goToCart"
+      >
+        In mijn winkelmandje
+        <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
+
     <!-- Modal voor uitleg prijs/voedselpakket -->
     <div
       v-if="showPackageInfo"

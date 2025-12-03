@@ -1,322 +1,433 @@
 <script setup lang="ts">
-onMounted(() => {
-  trackEvent('begin_checkout')
-})
+import { ESSENTIAL_PRODUCTS } from '~/data/essentialProducts'
 
+// --- Intake Data ---
 const {
   intake,
   calculatePrice,
-  BASE_PRICE,
   FOOD_PACKAGE_PRICE,
   HYGIENE_PRICES,
   TOOL_PRICES,
   FLIGHTBAG_PRICE,
-  PERSON_SURCHARGE,
 } = useIntake()
 
-const hygieneTotal = computed(() => {
-  if (!Array.isArray(intake.value.hygiene)) return 0
-  return intake.value.hygiene.reduce((sum, item) => {
-    return sum + HYGIENE_PRICES[item as keyof typeof HYGIENE_PRICES]
-  }, 0)
-})
+// --- Data Mapping Constants ---
+const HYGIENE_OPTS = [
+  { id: 'handgel', label: 'Desinfectie gel', subLabel: '250 ml', image: '/images/noodpakket/handgel.jpg' },
+  { id: 'wcpapier', label: 'Wc-papier', subLabel: '4 rollen', image: '/images/noodpakket/wcpapier.jpg' },
+  { id: 'doekjes', label: 'Natte doekjes', subLabel: 'Pak van 50 stuks', image: '/images/noodpakket/doekjes.jpg' },
+  { id: 'tandenborstel', label: 'Tandpasta + tandenborstel', subLabel: 'Setje', image: '/images/noodpakket/tandenborstel.jpg' },
+  { id: 'maandverband', label: 'Maandverband', subLabel: '1 pak (normaal)', image: '/images/noodpakket/maandverband.jpg' },
+]
 
-const toolsTotal = computed(() => {
-  if (!Array.isArray(intake.value.tools)) return 0
-  return intake.value.tools.reduce((sum, item) => {
-    return sum + TOOL_PRICES[item as keyof typeof TOOL_PRICES]
-  }, 0)
-})
-const personsCount = computed(() => intake.value.persons || 1)
+const TOOL_OPTS = [
+  { id: 'hammer', label: 'Hamer', subLabel: 'Klauwhamer', image: '/images/noodpakket/hammer.jpg' },
+  { id: 'opener', label: 'Blikopener', subLabel: 'RVS', image: '/images/noodpakket/opener.jpg' },
+  { id: 'saw', label: 'Zaag', subLabel: 'Handzaag (hout)', image: '/images/noodpakket/saw.jpg' },
+  { id: 'tang', label: 'Kniptang', subLabel: 'Gehard staal', image: '/images/noodpakket/tang.jpg' },
+]
 
+// --- State voor Row Modes ---
+const itemModes = ref<Record<string, 'default' | 'editing' | 'deleting'>>({})
+const touchStartX = ref(0)
+const touchCurrentId = ref<string | null>(null)
 
-const hygieneLabels: Record<string, string> = {
-  handgel: 'Handgel',
-  wcpapier: 'Wc-papier',
-  doekjes: 'Natte doekjes',
-  tandenborstel: 'Tandpasta + tandenborstel',
-  maandverband: 'Maandverband',
+// --- Helpers ---
+const formatPrice = (price: number) => price.toFixed(2)
+
+// Helper om aantallen te tellen in een array
+const countOccurrences = (arr: string[]) => {
+  return arr.reduce((acc, curr) => {
+    acc[curr] = (acc[curr] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
 }
 
-const toolLabels: Record<string, string> = {
-  hammer: 'Hamer',
-  saw: 'Zaag',
-  tang: 'Kniptang',
-}
+// --- Cart Items Generator ---
+const cartItems = computed(() => {
+  const items = []
+  const persons = intake.value.persons || 1
 
-// init aantallen
-onMounted(() => {
+  // 1. Essentials (groeperen)
+  if (intake.value.selectedEssentials) {
+    const essentialCounts = countOccurrences(intake.value.selectedEssentials)
+    
+    // Loop door master list om volgorde te behouden
+    ESSENTIAL_PRODUCTS.forEach(prod => {
+      const count = essentialCounts[prod.id]
+      if (count > 0) {
+        // Als het product "multiplies" is (bv water), is het aantal = count * persons
+        // Als het niet multiplies (bv radio), is het gewoon count
+        const displayQty = prod.multiplies ? count * persons : count
+        const totalPrice = prod.multiplies ? prod.price * count * persons : prod.price * count
+        
+        items.push({
+          uniqueId: `essential-${prod.id}`,
+          originalId: prod.id,
+          type: 'essential',
+          label: prod.label,
+          subLabel: prod.subLabel,
+          image: prod.image,
+          quantity: displayQty, // Totaal aantal stuks
+          baseCount: count,     // Aantal keer geselecteerd in array
+          price: totalPrice,
+          isFixedQuantity: prod.multiplies // Water/deken zit vast aan personen (of je moet hele sets toevoegen)
+        })
+      }
+    })
+  }
+
+  // 2. Voedsel
   if (intake.value.foodInventory === 'buy') {
-    if (!intake.value.foodPackages || intake.value.foodPackages < 0) {
-      intake.value.foodPackages = intake.value.persons || 1
-    }
-  } else {
-    intake.value.foodPackages = 0
+    // Hier nemen we aan dat 1 unit = pakket voor 1 huishouden (geschaald op personen)
+    // Als je meerdere pakketten wilt, moet je foodPackages gebruiken als multiplier
+    // Voor nu houden we het simpel op de boolean/persons logica van de intake
+    items.push({
+      uniqueId: 'food-pack',
+      type: 'food',
+      label: 'Houdbaar voedselpakket',
+      subLabel: `Voor ${persons} personen (72u)`,
+      image: '/images/noodpakket/voedselpakket.jpg',
+      quantity: persons, 
+      baseCount: 1,
+      price: persons * FOOD_PACKAGE_PRICE,
+      isFixedQuantity: true // Zit vast aan personen in dit model
+    })
   }
 
-  if (!intake.value.waterBags || intake.value.waterBags < 0) {
-    intake.value.waterBags = intake.value.persons || 1
+  // 3. Vluchttas
+  if (intake.value.flightbag === 'yes') {
+    items.push({
+      uniqueId: 'flightbag-item',
+      type: 'flightbag',
+      label: 'Vluchttas',
+      subLabel: '30 liter (Rugzak)',
+      image: '/images/noodpakket/vluchttas.jpg',
+      quantity: 1,
+      baseCount: 1,
+      price: FLIGHTBAG_PRICE,
+      isFixedQuantity: false // Je zou 2 tassen kunnen willen
+    })
   }
 
-  calculatePrice()
+  // 4. Hygiëne (Groeperen)
+  if (Array.isArray(intake.value.hygiene)) {
+    const hygieneCounts = countOccurrences(intake.value.hygiene)
+    
+    HYGIENE_OPTS.forEach(def => {
+      const count = hygieneCounts[def.id]
+      if (count > 0) {
+        items.push({
+          uniqueId: `hygiene-${def.id}`,
+          originalId: def.id,
+          type: 'hygiene',
+          label: def.label,
+          subLabel: def.subLabel,
+          image: def.image,
+          quantity: count,
+          baseCount: count,
+          price: (HYGIENE_PRICES[def.id as keyof typeof HYGIENE_PRICES] || 0) * count,
+          isFixedQuantity: false
+        })
+      }
+    })
+  }
+
+  // 5. Tools (Groeperen)
+  if (Array.isArray(intake.value.tools)) {
+    const toolCounts = countOccurrences(intake.value.tools)
+
+    TOOL_OPTS.forEach(def => {
+      const count = toolCounts[def.id]
+      if (count > 0) {
+        items.push({
+          uniqueId: `tool-${def.id}`,
+          originalId: def.id,
+          type: 'tool',
+          label: def.label,
+          subLabel: def.subLabel,
+          image: def.image,
+          quantity: count,
+          baseCount: count,
+          price: (TOOL_PRICES[def.id as keyof typeof TOOL_PRICES] || 0) * count,
+          isFixedQuantity: false
+        })
+      }
+    })
+  }
+
+  return items
 })
 
-watch(
-  () => [
-    intake.value.foodInventory,
-    intake.value.foodPackages,
-    intake.value.waterBags,
-    intake.value.hygiene,
-    intake.value.flightbag,
-    intake.value.tools,
-    intake.value.plan,
-  ],
-  () => {
-    calculatePrice()
-  },
-  { deep: true }
-)
+// --- Interaction Handlers ---
 
-const incrementFood = () => {
-  if (intake.value.foodInventory !== 'buy') return
-  intake.value.foodPackages = (intake.value.foodPackages || 0) + 1
-}
-const decrementFood = () => {
-  if (intake.value.foodInventory !== 'buy') return
-  const current = intake.value.foodPackages || 0
-  intake.value.foodPackages = Math.max(0, current - 1)
+const setEditMode = (uniqueId: string) => {
+  // Sluit alle anderen
+  Object.keys(itemModes.value).forEach(k => itemModes.value[k] = 'default')
+  itemModes.value[uniqueId] = 'editing'
 }
 
-const incrementWater = () => {
-  intake.value.waterBags = (intake.value.waterBags || 0) + 1
+const setDeleteMode = (uniqueId: string) => {
+  Object.keys(itemModes.value).forEach(k => itemModes.value[k] = 'default')
+  itemModes.value[uniqueId] = 'deleting'
 }
-const decrementWater = () => {
-  const current = intake.value.waterBags || 1
-  intake.value.waterBags = Math.max(1, current - 1)
+
+const resetMode = (uniqueId: string) => {
+  itemModes.value[uniqueId] = 'default'
+}
+
+// AANTAL VERHOGEN
+const increaseQty = (item: any) => {
+  if (item.type === 'essential') {
+    // Voeg ID toe aan array
+    intake.value.selectedEssentials.push(item.originalId)
+  } else if (item.type === 'hygiene') {
+    intake.value.hygiene.push(item.originalId)
+  } else if (item.type === 'tool') {
+    intake.value.tools.push(item.originalId)
+  } else if (item.type === 'flightbag') {
+    // Vluchttas is in huidige setup 'yes'/'no'. 
+    // Om er 2 te ondersteunen zou de intake state moeten veranderen naar number.
+    // Voor nu laten we flightbag enkelvoudig, of we doen een console.warn.
+    // Als je echt meerdere tassen wilt, moet useIntake aangepast worden.
+    // Voor de demo doen we even niks of switchen we logica (maar dat is complexer).
+    // Workaround: We laten het hier even bij 1 max voor flightbag in deze structuur.
+  }
+  calculatePrice()
+}
+
+// AANTAL VERLAGEN
+const decreaseQty = (item: any) => {
+  // Als er meer dan 1 is: eentje weghalen
+  if (item.baseCount > 1) {
+    if (item.type === 'essential') {
+      const idx = intake.value.selectedEssentials.indexOf(item.originalId)
+      if (idx > -1) intake.value.selectedEssentials.splice(idx, 1)
+    } else if (item.type === 'hygiene') {
+      const idx = intake.value.hygiene.indexOf(item.originalId)
+      if (idx > -1) intake.value.hygiene.splice(idx, 1)
+    } else if (item.type === 'tool') {
+      const idx = intake.value.tools.indexOf(item.originalId)
+      if (idx > -1) intake.value.tools.splice(idx, 1)
+    }
+    // Als flightbag > 1 zou kunnen, hier ook logic.
+  } else {
+    // Als het de laatste is -> Delete Mode
+    setDeleteMode(item.uniqueId)
+  }
+  calculatePrice()
+}
+
+// ITEM VERWIJDEREN
+const removeItem = (item: any) => {
+  if (item.type === 'essential') {
+    intake.value.selectedEssentials = intake.value.selectedEssentials.filter((id: string) => id !== item.originalId)
+  } else if (item.type === 'food') {
+    intake.value.foodInventory = 'inhouse'
+  } else if (item.type === 'flightbag') {
+    intake.value.flightbag = 'no'
+  } else if (item.type === 'hygiene') {
+    intake.value.hygiene = intake.value.hygiene.filter((id: string) => id !== item.originalId)
+  } else if (item.type === 'tool') {
+    intake.value.tools = intake.value.tools.filter((id: string) => id !== item.originalId)
+  }
+  
+  delete itemModes.value[item.uniqueId]
+  calculatePrice()
+}
+
+// --- Touch / Swipe Handling ---
+const onTouchStart = (e: TouchEvent, uniqueId: string) => {
+  touchStartX.value = e.touches[0].clientX
+  touchCurrentId.value = uniqueId
+}
+
+const onTouchEnd = (e: TouchEvent, uniqueId: string) => {
+  if (touchCurrentId.value !== uniqueId) return
+  
+  const endX = e.changedTouches[0].clientX
+  const diff = touchStartX.value - endX
+
+  if (diff > 50) {
+    setDeleteMode(uniqueId)
+  } else if (diff < -50) {
+    resetMode(uniqueId)
+  }
+  
+  touchCurrentId.value = null
 }
 
 const goToCheckout = () => {
   calculatePrice()
   navigateTo('/checkout')
 }
+
+// Klik buiten items reset de state
+const handleGlobalClick = (e: MouseEvent) => {
+  // Simpele check: als we niet op een 'interactive-row' klikken, resetten
+  const target = e.target as HTMLElement
+  if (!target.closest('.interactive-row')) {
+    Object.keys(itemModes.value).forEach(k => itemModes.value[k] = 'default')
+  }
+}
+
+onMounted(() => {
+  calculatePrice()
+  document.addEventListener('click', handleGlobalClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleGlobalClick)
+})
+
+watch(intake, () => calculatePrice(), { deep: true })
 </script>
 
 <template>
-  <div class="min-h-screen py-1">
-    <div class="w-full  px-6 py-8 md:px-12 md:py-12">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
-        <div class="space-y-2">
-
-          <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-slate-900">
-            Winkelmandje
-          </h1>
-        </div>
-
-        <NuxtLink
-          to="/samenstellen"
-          class="text-xs text-slate-500 hover:text-slate-700 underline"
-        >
-          Noodpakket aanpassen
+  <div class="min-h-screen pb-32">
+    <div class="sticky top-0 z-30  backdrop-blur-sm border-b border-slate-100">
+      <div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+        <h1 class="text-lg font-semibold text-slate-900">Winkelmandje</h1>
+        <NuxtLink to="/samenstellen-deluxe" class="text-sm font-medium text-emerald-600">
+          Aanpassen
         </NuxtLink>
       </div>
+    </div>
 
-      <div class="grid md:grid-cols-3 gap-10">
-        <!-- Linker: overzicht inhoud -->
-        <div class="md:col-span-2 space-y-6">
-          <div class=" space-y-3 text-sm">
-
-            <div class="flex justify-between">
-              <span class="text-slate-500">Aantal personen</span>
-              <span class="font-medium text-slate-900">
-                {{ intake.persons }}
-              </span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-500">Voedselpakket</span>
-              <span class="font-medium text-right text-slate-900">
-                {{
-                  intake.foodInventory === 'inhouse'
-                    ? 'Geen voedselpakket'
-                    : intake.foodInventory === 'shoppinglist'
-                      ? 'Ik koop zelf nog voedsel'
-                      : intake.foodInventory === 'buy'
-                        ? 'Noodvoedingspakket voor 72 uur'
-                        : '-'
-                }}
-              </span>
-            </div>
-
-            <div class="flex justify-between">
-              <span class="text-slate-500">Vluchttas</span>
-              <span class="font-medium text-slate-900">
-                {{
-                  intake.flightbag === 'yes'
-                    ? 'Ja'
-                    : 'Geen vluchttas'
-                }}
-              </span>
-            </div>
+    <div class="max-w-2xl mx-auto px-4 py-2 overflow-hidden">
+      
+      <div class="divide-y divide-slate-100">
+        <div 
+          v-for="item in cartItems" 
+          :key="item.uniqueId" 
+          class="relative h-[88px] w-full interactive-row"
+          @touchstart="onTouchStart($event, item.uniqueId)"
+          @touchend="onTouchEnd($event, item.uniqueId)"
+        >
+          <div class="absolute inset-y-0 left-0 flex items-center gap-3 pl-4 w-1/2">
+            <button 
+              @click.stop="decreaseQty(item)"
+              class="w-8 h-8 rounded-full border border-slate-300 bg-white text-slate-600 flex items-center justify-center font-bold text-lg shadow-sm active:scale-95 transition-colors hover:bg-slate-50"
+            >
+              −
+            </button>
+            
+            <span class="text-base font-semibold w-4 text-center">{{ item.quantity }}</span>
+            
+            <button 
+              @click.stop="increaseQty(item)"
+              class="w-8 h-8 rounded-full border border-slate-300 bg-white text-emerald-600 flex items-center justify-center font-bold text-lg shadow-sm active:scale-95 transition-colors hover:bg-slate-50"
+              :class="{'opacity-50 cursor-not-allowed': item.isFixedQuantity}"
+              :disabled="item.isFixedQuantity"
+            >
+              +
+            </button>
           </div>
 
-            <div class="pt-2 border-t border-slate-200">
-              <span class="block text-slate-500 mb-1">Noodpakket basis</span>
-              <ul class="text-xs text-slate-600 space-y-1">
-                <li>• Noodradio</li>
-                <li>• {{ personsCount }}x Wateropslag</li>
-                <li>• EHBO-kit</li>
-                <li>• {{ personsCount }}x Deken + kussen</li>
-                <li>• Zaklamp</li>
-                <li>• Batterijen</li>
-                <li>• Powerbank</li>
-            </ul>
-
-            </div>
-
-            <div v-if="Array.isArray(intake.hygiene) && intake.hygiene.length" class="pt-2 border-t border-slate-200">
-              <span class="block text-slate-500 mb-1">Hygiëne</span>
-              <ul class="text-xs text-slate-600 space-y-1">
-                <li v-for="option in intake.hygiene" :key="option">
-                  • {{ hygieneLabels[option] || option }}
-                </li>
-              </ul>
-            </div>
-
-
-            <div v-if="Array.isArray(intake.tools) && intake.tools.length" class="pt-2 border-t border-slate-200">
-              <span class="block text-slate-500 mb-1">Noodgereedschap</span>
-              <ul class="text-xs text-slate-600 space-y-1">
-                <li v-for="option in intake.tools" :key="option">
-                  • {{ toolLabels[option] || option }}
-                </li>
-              </ul>
-            </div>
-
-
-     
-        </div>
-
-        <!-- Rechter: prijs + verder knop -->
-        <div class="md:col-span-1 space-y-5">
-          <div class="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-4 space-y-3 text-sm">
-            <p class="text-xs font-medium text-emerald-700 uppercase tracking-[0.16em]">
-              Jouw prijs
-            </p>
-
-            <div class="flex justify-between items-center">
-              <span class="text-slate-800">Noodpakket essentieel {{intake.persons}} pers.</span>
-              <span class="font-medium text-slate-900">
-                € {{ (BASE_PRICE+PERSON_SURCHARGE*(intake.persons-1)).toFixed(2) }}
-              </span>
-            </div>
-
-
-            <div
-              v-if="intake.foodInventory === 'buy'"
-              class="flex justify-between text-xs"
+          <div class="absolute inset-y-0 right-0 flex items-center justify-end pr-0 w-1/3">
+            <button
+              @click.stop="removeItem(item)"
+              class="h-full w-24 bg-[#E00000] text-white font-semibold text-sm flex items-center justify-center hover:bg-red-700 transition-colors"
             >
-              <span class="text-slate-800">
-                + Voedselpakket
-              </span>
-              <span class="font-medium text-slate-900">
-                € {{ (((intake.foodPackages || 0) * FOOD_PACKAGE_PRICE)).toFixed(2) }}
-              </span>
-            </div>
+              Verwijderen
+            </button>
+          </div>
 
-            <div
-              v-if="intake.flightbag === 'yes'"
-              class="flex justify-between text-xs"
-            >
-              <span class="text-slate-800">
-                + Vluchttas
-              </span>
-              <span class="font-medium text-slate-900">
-                   € {{ FLIGHTBAG_PRICE.toFixed(2) }}
-              </span>
-            </div>
-
-
-            <div
-            v-if="Array.isArray(intake.hygiene) && intake.hygiene.length"
-            class="flex justify-between text-xs"
-            >
-            <span class="text-slate-800">
-                + Hygiëne producten
-            </span>
-            <span class="font-medium text-slate-900">
-                € {{ hygieneTotal.toFixed(2) }}
-            </span>
-            </div>
-
-            <div
-            v-if="Array.isArray(intake.tools) && intake.tools.length"
-            class="flex justify-between text-xs"
-            >
-            <span class="text-slate-800">
-                + Noodgereedschap 
-            </span>
-            <span class="font-medium text-slate-900">
-                € {{ toolsTotal.toFixed(2) }}
-            </span>
-            </div>
-
-
-            <!-- Verzendkosten -->
-            <div class="flex justify-between text-xs">
-                <span class="text-slate-800">Verzendkosten</span>
-                <span class="font-medium text-orange-600">Gratis</span>
-            </div>
-
-
-            <div class="border-t border-emerald-100 pt-3 mt-2 flex justify-between items-baseline">
-              <span class="text-xs font-medium text-emerald-800 uppercase tracking-[0.16em]">
-                Totaal
-              </span>
-              <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-semibold text-emerald-800">
-                  € {{ intake.price.toFixed(2) }}
-                </span>
+          <div 
+            class="absolute inset-0 bg-white flex items-start gap-4 py-4 px-2 transition-transform duration-300 ease-out z-10 border-b border-transparent"
+            :class="{
+              'translate-x-[120px]': itemModes[item.uniqueId] === 'editing',
+              '-translate-x-[100px]': itemModes[item.uniqueId] === 'deleting',
+              'translate-x-0': itemModes[item.uniqueId] === 'default' || !itemModes[item.uniqueId]
+            }"
+            @click="resetMode(item.uniqueId)"
+          >
+            
+            <div class="shrink-0 pt-3 transition-opacity duration-200"
+                 :class="itemModes[item.uniqueId] === 'editing' ? 'opacity-0 pointer-events-none' : 'opacity-100'"
+                 @click.stop="setEditMode(item.uniqueId)">
+              <div 
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700 cursor-pointer hover:bg-slate-200 transition-colors border border-slate-200"
+              >
+                {{ item.quantity }}
               </div>
             </div>
-          </div>
 
-          <button
-            class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-700"
-            type="button"
-            @click="goToCheckout"
-            >
-            Ik ga bestellen
-            </button>
-
-            <!-- Betaalmethoden -->
-            <div class="flex items-center justify-center gap-4 mt-3 opacity-70">
-            <!-- iDEAL -->
-            <img
-                src="../images/ideal.svg"
-                alt="iDEAL"
-                class="h-6 w-auto"
-            />
-
-            <!-- Creditcards (Visa + Mastercard naast elkaar gezet in één afbeelding voor nette schaal) -->
-            <img
-                src="../images/visa.svg"
-                alt="Visa"
-                class="h-6 w-auto"
-            />
-
-            <img
-                src="../images/mastercard.svg"
-                alt="Mastercard"
-                class="h-6 w-auto"
-            />
-            <img
-                src="../images/postnl.svg"
-                alt="PostNL"
-                class="h-6 w-auto"
-            />
+            <div class="shrink-0 w-14 h-14 bg-slate-50 rounded-lg overflow-hidden">
+              <img 
+                :src="item.image" 
+                :alt="item.label" 
+                class="w-full h-full object-cover mix-blend-multiply" 
+              />
             </div>
+
+            <div class="flex-1 min-w-0 pt-1 pointer-events-none">
+              <h3 class="text-base font-medium text-slate-900 leading-tight">
+                {{ item.label }}
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5 truncate">
+                {{ item.subLabel }}
+              </p>
+            </div>
+
+            <div class="shrink-0 pt-1 text-right pointer-events-none">
+              <span class="text-base font-bold text-slate-900 tracking-tight">
+                {{ formatPrice(item.price) }}
+              </span>
+            </div>
+          </div>
 
         </div>
       </div>
+
+      <div class="mt-6 pt-6 border-t border-slate-100 space-y-3 pb-8">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-slate-500">Totaal goederen</span>
+          <span class="font-medium text-slate-900">{{ formatPrice(intake.price) }}</span>
+        </div>
+        
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-slate-500">Bezorging</span>
+          <span class="font-medium text-emerald-600">Altijd gratis</span>
+        </div>
+
+        <div class="flex justify-between items-center text-lg pt-2 border-t border-slate-50 mt-2">
+          <span class="font-medium text-slate-900">Te betalen</span>
+          <span class="font-bold text-slate-900">{{ formatPrice(intake.price) }}</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center gap-4 opacity-40 grayscale pb-4">
+        <img src="/images/ideal.svg" alt="iDEAL" class="h-5 w-auto" />
+        <img src="/images/visa.svg" alt="Visa" class="h-5 w-auto" />
+        <img src="/images/mastercard.svg" alt="Mastercard" class="h-5 w-auto" />
+        <img src="/images/postnl.svg" alt="PostNL" class="h-5 w-auto" />
+      </div>
+
     </div>
+
+    <div class="fixed bottom-0 inset-x-0 bg-white border-t border-slate-100 p-4 z-40 safe-area-bottom">
+      <div class="max-w-2xl mx-auto">
+        <button
+          type="button"
+          class="w-full group relative flex items-center justify-between bg-emerald-600 hover:bg-emerald-700 text-white text-base font-bold py-3.5 px-5 rounded-full shadow-md transition-all active:scale-[0.98]"
+          @click="goToCheckout"
+        >
+          <span>Doorgaan naar bestellen</span>
+          <div class="flex items-center gap-2">
+            <span class="bg-black/10 px-2 py-0.5 rounded text-white group-hover:bg-black/20 transition-colors">
+              € {{ formatPrice(intake.price) }}
+            </span>
+          </div>
+        </button>
+      </div>
+    </div>
+
   </div>
 </template>
+
+<style scoped>
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+</style>

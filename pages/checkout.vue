@@ -1,36 +1,16 @@
-<!-- pages/checkout.vue -->
 <script setup lang="ts">
 const {
   intake,
   calculatePrice,
-  BASE_PRICE,
-  FOOD_PACKAGE_PRICE,
-  HYGIENE_PRICES,
-  TOOL_PRICES,
-  FLIGHTBAG_PRICE,
-  PERSON_SURCHARGE,
 } = useIntake()
 
 const loading = ref(false)
 const error = ref<string | null>(null)
 
-// totaal van gekozen hygiëneproducten
-const hygieneTotal = computed(() => {
-  if (!Array.isArray(intake.value.hygiene)) return 0
-  return intake.value.hygiene.reduce((sum, item) => {
-    return sum + HYGIENE_PRICES[item as keyof typeof HYGIENE_PRICES]
-  }, 0)
-})
+// Helper voor prijs weergave
+const formatPrice = (price: number) => price.toFixed(2)
 
-// totaal van gekozen gereedschap
-const toolsTotal = computed(() => {
-  if (!Array.isArray(intake.value.tools)) return 0
-  return intake.value.tools.reduce((sum, item) => {
-    return sum + TOOL_PRICES[item as keyof typeof TOOL_PRICES]
-  }, 0)
-})
-
-// bij directe navigatie naar /checkout toch een prijs hebben
+// Zorg dat prijs berekend is bij laden
 onMounted(() => {
   if (!intake.value.price || intake.value.price === 0) {
     calculatePrice()
@@ -64,16 +44,12 @@ const pay = async () => {
         price: intake.value.price,
         description: 'Noodpakket op maat',
         meta: {
-          // laat deze velden staan als je backend ze verwacht,
-          // ook als ze eventueel undefined zijn
-          householdType: (intake.value as any).householdType,
           persons: intake.value.persons,
           foodInventory: intake.value.foodInventory,
           foodPackages: intake.value.foodPackages,
-          waterBags: (intake.value as any).waterBags,
           hygiene: intake.value.hygiene,
           tools: intake.value.tools,
-          plan: (intake.value as any).plan,
+          flightbag: intake.value.flightbag,
           address: intake.value.address,
         },
       },
@@ -90,258 +66,169 @@ const pay = async () => {
 }
 </script>
 
-
 <template>
-  <div class="min-h-screen  flex items-center justify-center py-1">
-    <div class="w-full  px-6 py-8 md:px-10 md:py-10">
-      <!-- Header -->
-      <header class="mb-8 space-y-2">
-        <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-slate-900">
-          Noodpakket op maat bestellen
+  <div class="min-h-screen  flex justify-center py-8 md:py-12">
+    <div class="w-full max-w-2xl px-6">
+      
+      <header class="mb-8">
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900">
+          Gegevens invullen
         </h1>
-
-        <NuxtLink
-          to="/cart"
-          class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 underline mt-2"
-        >
-          ← Terug naar winkelwagen
-        </NuxtLink>
       </header>
 
-      <!-- 1. Samenvatting + prijs (bovenaan) -->
-      <section class="space-y-4 mb-8">
-        <div class="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-4 space-y-3 text-sm">
-          <p class="text-xs font-medium text-emerald-700 uppercase tracking-[0.16em]">
-            Jouw noodpakket op maat
-          </p>
-
-          <!-- Basis -->
-          <div class="flex justify-between items-center">
-            <span class="text-slate-800">Noodpakket essentieel {{ intake.persons }} pers.</span>
-            <span class="font-medium text-slate-900">
-              € {{ (BASE_PRICE + PERSON_SURCHARGE * (intake.persons - 1)).toFixed(2) }}
-            </span>
+      <section class="mb-10 bg-slate-50 border border-slate-200 rounded-2xl p-6">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+          <div>
+            <span class="block text-sm text-slate-500 mb-1">Totaal te betalen</span>
+            <span class="text-3xl font-bold text-slate-900">€ {{ formatPrice(intake.price) }}</span>
           </div>
-
-          <!-- Voedselpakketten -->
-          <div
-            v-if="intake.foodInventory === 'buy'"
-            class="flex justify-between text-xs"
-          >
-            <span class="text-slate-800">
-              + Voedselpakket
-            </span>
-            <span class="font-medium text-slate-900">
-              € {{ (((intake.foodPackages || 0) * FOOD_PACKAGE_PRICE)).toFixed(2) }}
-            </span>
-          </div>
-
-          <!-- Vluchttas -->
-          <div
-            v-if="intake.flightbag === 'yes'"
-            class="flex justify-between text-xs"
-          >
-            <span class="text-slate-800">
-              + Vluchttas
-            </span>
-            <span class="font-medium text-slate-900">
-              € {{ FLIGHTBAG_PRICE.toFixed(2) }}
-            </span>
-          </div>
-
-          <!-- Hygiëne -->
-          <div
-            v-if="Array.isArray(intake.hygiene) && intake.hygiene.length"
-            class="flex justify-between text-xs"
-          >
-            <span class="text-slate-800">
-              + Hygiëne producten
-            </span>
-            <span class="font-medium text-slate-900">
-              € {{ hygieneTotal.toFixed(2) }}
-            </span>
-          </div>
-
-          <!-- Tools -->
-          <div
-            v-if="Array.isArray(intake.tools) && intake.tools.length"
-            class="flex justify-between text-xs"
-          >
-            <span class="text-slate-800">
-              + Noodgereedschap
-            </span>
-            <span class="font-medium text-slate-900">
-              € {{ toolsTotal.toFixed(2) }}
-            </span>
-          </div>
-
-          <!-- Verzendkosten -->
-          <div class="flex justify-between text-xs">
-                <span class="text-slate-800">Verzendkosten</span>
-                <span class="font-medium text-orange-600">Gratis</span>
-          </div>
-
-          <!-- Totaal -->
-          <div class="border-t border-emerald-100 pt-3 mt-2 flex justify-between items-baseline">
-            <span class="text-xs font-medium text-emerald-800 uppercase tracking-[0.16em]">
-              Totaal
-            </span>
-            <div class="flex items-baseline gap-2">
-              <span class="text-2xl font-semibold text-emerald-800">
-                € {{ intake.price.toFixed(2) }}
-              </span>
+          
+          <div class="text-sm space-y-1">
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="text-emerald-600">✓</span> Gratis verzending
+            </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="text-emerald-600">✓</span> Binnen 5 werkdagen in huis
             </div>
           </div>
+        </div>
 
-          <p class="text-[11px] text-emerald-800">
-            Bedrag inclusief btw. Het noodpakket heb je binnen 5 werkdagen in huis!
-          </p>
+        <div class="pt-4 border-t border-slate-200">
+          <NuxtLink 
+            to="/cart" 
+            class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+          >
+            ← Bestelling aanpassen
+          </NuxtLink>
         </div>
       </section>
 
-      <!-- 2. Adres + betalingen -->
       <section class="space-y-6">
-        <div class="space-y-4">
-          <h2 class="text-xl font-semibold text-slate-900">
-            Bezorgadres
-          </h2>
+        <h2 class="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2">
+          Bezorgadres
+        </h2>
 
+        <div class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-1">
-              <label class="block text-sm font-medium text-slate-700">
-                Voornaam
-              </label>
+              <label class="block text-sm font-medium text-slate-700">Voornaam</label>
               <input
                 v-model="intake.address.firstName"
                 type="text"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
               />
             </div>
-
             <div class="space-y-1">
-              <label class="block text-sm font-medium text-slate-700">
-                Achternaam
-              </label>
+              <label class="block text-sm font-medium text-slate-700">Achternaam</label>
               <input
                 v-model="intake.address.lastName"
                 type="text"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
               />
             </div>
           </div>
 
           <div class="grid grid-cols-3 gap-4">
             <div class="col-span-2 space-y-1">
-              <label class="block text-sm font-medium text-slate-700">
-                Straat
-              </label>
+              <label class="block text-sm font-medium text-slate-700">Straat</label>
               <input
                 v-model="intake.address.street"
                 type="text"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
               />
             </div>
             <div class="col-span-1 space-y-1">
-              <label class="block text-sm font-medium text-slate-700">
-                Nr.
-              </label>
+              <label class="block text-sm font-medium text-slate-700">Huisnr.</label>
               <input
                 v-model="intake.address.houseNumber"
                 type="text"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
               />
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="space-y-1">
-              <label class="block text-sm font-medium text-slate-700">
-                Postcode
-              </label>
+              <label class="block text-sm font-medium text-slate-700">Postcode</label>
               <input
                 v-model="intake.address.postalCode"
                 type="text"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
               />
             </div>
             <div class="space-y-1 sm:col-span-2">
-              <label class="block text-sm font-medium text-slate-700">
-                Plaats
-              </label>
+              <label class="block text-sm font-medium text-slate-700">Plaats</label>
               <input
                 v-model="intake.address.city"
                 type="text"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
               />
-            </div>
-          </div>
-
-          <!-- E-mail + telefoon naast elkaar, onder plaats -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="space-y-1">
-              <label class="block text-sm font-medium text-slate-700">
-                E-mailadres
-              </label>
-              <input
-                v-model="intake.address.email"
-                type="email"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-              <p class="text-xs text-slate-400">
-                We sturen je bevestiging en updates naar dit adres.
-              </p>
-            </div>
-
-            <div class="space-y-1">
-              <label class="block text-sm font-medium text-slate-700">
-                Telefoonnummer
-              </label>
-              <input
-                v-model="intake.address.phone"
-                type="tel"
-                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-              <p class="text-xs text-slate-400">
-                Handig als we je snel willen bereiken over de bestelling.
-              </p>
             </div>
           </div>
 
           <div class="space-y-1">
-            <label class="block text-sm font-medium text-slate-700">
-              Land
-            </label>
+            <label class="block text-sm font-medium text-slate-700">Land</label>
             <input
               v-model="intake.address.country"
               type="text"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
             />
           </div>
         </div>
 
-        <button
-          class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed"
-          :disabled="loading || !isAddressValid"
-          type="button"
-          @click="pay"
-        >
-          <span v-if="!loading">Bestelling plaatsen en betalen</span>
-          <span v-else>Betaling wordt klaargezet…</span>
-        </button>
+        <h2 class="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2 mt-8">
+          Contactgegevens
+        </h2>
 
-        <p v-if="!isAddressValid" class="text-xs text-slate-400">
-          Vul je bezorgadres en e-mailadres volledig in om door te gaan naar de betaalpagina.
-        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-slate-700">E-mailadres</label>
+            <input
+              v-model="intake.address.email"
+              type="email"
+              class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
+            />
+            <p class="text-xs text-slate-400">Voor de orderbevestiging.</p>
+          </div>
 
-        <p v-if="error" class="text-xs text-red-500">
-          {{ error }}
-        </p>
+          <div class="space-y-1">
+            <label class="block text-sm font-medium text-slate-700">Telefoonnummer</label>
+            <input
+              v-model="intake.address.phone"
+              type="tel"
+              class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-shadow"
+            />
+            <p class="text-xs text-slate-400">Voor updates over de bezorging.</p>
+          </div>
+        </div>
 
-        <p class="text-[11px] text-slate-400">
-          Door af te rekenen ga je akkoord met onze algemene voorwaarden en privacyverklaring.
-        </p>
+        <div class="pt-6">
+          <button
+            class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-6 py-4 text-base font-bold text-white shadow-md hover:bg-emerald-700 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="loading || !isAddressValid"
+            type="button"
+            @click="pay"
+          >
+            <span v-if="!loading">Betalen en afronden</span>
+            <span v-else>Even geduld...</span>
+          </button>
+
+          <p v-if="!isAddressValid" class="text-center text-xs text-red-500 mt-3 font-medium">
+            Vul alle velden in om door te gaan.
+          </p>
+
+          <p v-if="error" class="text-center text-xs text-red-500 mt-3">
+            {{ error }}
+          </p>
+
+          <div class="flex items-center justify-center gap-3 mt-6 opacity-40 grayscale">
+            <img src="/images/ideal.svg" alt="iDEAL" class="h-5 w-auto" />
+            <img src="/images/visa.svg" alt="Visa" class="h-5 w-auto" />
+            <img src="/images/mastercard.svg" alt="Mastercard" class="h-5 w-auto" />
+          </div>
+        </div>
       </section>
+
     </div>
   </div>
 </template>
-
