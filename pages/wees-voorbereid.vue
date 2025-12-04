@@ -14,7 +14,7 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#FFFDF3] text-slate-900">
+  <div class="min-h-screen bg-[#FFF] text-slate-900">
     <main class="max-w-5xl mx-auto px-4 md:px-6 py-10 md:py-16 space-y-16">
       <section class="space-y-6">
         <p class="text-sm font-medium tracking-wide uppercase text-emerald-700">
@@ -176,7 +176,7 @@ useHead({
           </p>
         </div>
         <NuxtLink
-          to="/intake"
+          to="/samenstellen"
           class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm md:text-base font-medium text-white shadow-sm hover:bg-emerald-700"
         >
           Stel je noodpakket samen

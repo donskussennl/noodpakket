@@ -13,18 +13,18 @@ const {
 
 // --- Data Mapping Constants ---
 const HYGIENE_OPTS = [
-  { id: 'handgel', label: 'Desinfectie gel', subLabel: '250 ml', image: '/images/noodpakket/handgel.jpg' },
-  { id: 'wcpapier', label: 'Wc-papier', subLabel: '4 rollen', image: '/images/noodpakket/wcpapier.jpg' },
-  { id: 'doekjes', label: 'Natte doekjes', subLabel: 'Pak van 50 stuks', image: '/images/noodpakket/doekjes.jpg' },
-  { id: 'tandenborstel', label: 'Tandpasta + tandenborstel', subLabel: 'Setje', image: '/images/noodpakket/tandenborstel.jpg' },
-  { id: 'maandverband', label: 'Maandverband', subLabel: '1 pak (normaal)', image: '/images/noodpakket/maandverband.jpg' },
+  { id: 'handgel', label: 'Desinfectie gel', subLabel: '250 ml', image: '/images/noodpakket/handgel.png' },
+  { id: 'wcpapier', label: 'Wc-papier', subLabel: '4 rollen', image: '/images/noodpakket/wcpapier.png' },
+  { id: 'doekjes', label: 'Natte doekjes', subLabel: 'Pak van 50 stuks', image: '/images/noodpakket/natte-doekjes.png' },
+  { id: 'tandenborstel', label: 'Tandpasta + tandenborstel', subLabel: 'Setje', image: '/images/noodpakket/tandenborstel.png' },
+  { id: 'maandverband', label: 'Maandverband', subLabel: '1 pak (normaal)', image: '/images/noodpakket/maandverband.png' },
 ]
 
 const TOOL_OPTS = [
-  { id: 'hammer', label: 'Hamer', subLabel: 'Klauwhamer', image: '/images/noodpakket/hammer.jpg' },
-  { id: 'opener', label: 'Blikopener', subLabel: 'RVS', image: '/images/noodpakket/opener.jpg' },
-  { id: 'saw', label: 'Zaag', subLabel: 'Handzaag (hout)', image: '/images/noodpakket/saw.jpg' },
-  { id: 'tang', label: 'Kniptang', subLabel: 'Gehard staal', image: '/images/noodpakket/tang.jpg' },
+  { id: 'hammer', label: 'Hamer', subLabel: 'Klauwhamer', image: '/images/noodpakket/hamer.png' },
+  { id: 'opener', label: 'Blikopener', subLabel: 'RVS', image: '/images/noodpakket/blikopener.png' },
+  { id: 'saw', label: 'Zaag', subLabel: 'Handzaag (hout)', image: '/images/noodpakket/zaag.png' },
+  { id: 'tang', label: 'Kniptang', subLabel: 'Gehard staal', image: '/images/noodpakket/tang.png' },
 ]
 
 // --- State voor Row Modes ---
@@ -91,7 +91,7 @@ const cartItems = computed(() => {
       type: 'food',
       label: 'Houdbaar voedselpakket',
       subLabel: `Voor ${persons} personen (72u)`,
-      image: '/images/noodpakket/voedselpakket.jpg',
+      image: '/images/noodpakket/voedselpakket-nood.png',
       quantity: persons, 
       baseCount: 1,
       price: persons * FOOD_PACKAGE_PRICE,
@@ -106,7 +106,7 @@ const cartItems = computed(() => {
       type: 'flightbag',
       label: 'Vluchttas',
       subLabel: '30 liter (Rugzak)',
-      image: '/images/noodpakket/vluchttas.jpg',
+      image: '/images/noodpakket/vluchttas.png',
       quantity: 1,
       baseCount: 1,
       price: FLIGHTBAG_PRICE,

@@ -5,6 +5,12 @@ export default defineNuxtConfig({
 
   modules: ['@nuxtjs/tailwindcss', 'nuxt-gtag'],
 
+  // --- NIEUW STUKJE: Hier moet je ID staan ---
+  gtag: {
+    id: 'G-W4K1B0FNL2' // <-- Plak hier het ID uit Google Analytics (bijv. G-XZ123456)
+  },
+  // ------------------------------------------
+
   app: {
     head: {
       meta: [
@@ -25,10 +31,7 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-        // Of als je een png hebt in je public map:
-        // { rel: 'icon', type: 'image/png', href: '/jouw-logo.png' }
       ]
-
     }
   },
 

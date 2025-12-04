@@ -1,16 +1,24 @@
 <template>
   <NuxtLayout>
 
-    <div class="min-h-screen bg-[#FFFDF3] text-slate-900 font-sans flex flex-col">
+    <div class="min-h-screen bg-[#fff] text-slate-900 font-sans flex flex-col">
 
-      <header class="border-b border-slate-200 bg-[#FFFDF3]/95">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <header class="border-b border-slate-200 bg-[#fff]/95">
+        <div class="max-w-6xl mx-auto px-3 md:px-6 py-4 flex items-center justify-between">
+
           <NuxtLink
             to="/samenstellen"
-            class="text-xl font-semibold tracking-tight"
+            class="flex items-center gap-3 whitespace-nowrap"
             @click="closeMobile"
           >
-            Noodpakket-op-maat.nl
+            <img
+              src="/images/logo.svg"
+              alt="Logo"
+              class="h-8 w-auto"
+            />
+            <span class="text-xl font-semibold tracking-tight">
+              Noodpakket-op-maat.nl
+            </span>
           </NuxtLink>
 
           <nav class="hidden md:flex items-center gap-6 text-sm">
@@ -30,7 +38,7 @@
           </button>
         </div>
 
-        <div v-if="mobileOpen" class="md:hidden border-t border-slate-200 bg-[#FFFDF3]">
+        <div v-if="mobileOpen" class="md:hidden border-t border-slate-200 bg-[#fff]">
           <nav class="max-w-6xl mx-auto px-6 py-3 flex flex-col gap-3 text-sm">
             <NuxtLink class="py-1 hover:text-emerald-600" to="/samenstellen" @click="closeMobile">Noodpakket samenstellen</NuxtLink>
             <NuxtLink class="py-1 hover:text-emerald-600" to="/wees-voorbereid" @click="closeMobile">Bereid je voor</NuxtLink>
@@ -41,7 +49,7 @@
       </header>
 
       <main class="pt-10 pb-10 flex-grow">
-        <div class="max-w-6xl mx-auto px-6">
+        <div class="max-w-6xl mx-auto px-2 sm:px-4 md:px-6">
           <NuxtPage />
         </div>
       </main>

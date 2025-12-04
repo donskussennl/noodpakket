@@ -38,7 +38,7 @@ const {
 
 const FOOD_INFO: LocalProductInfo = {
   id: 'food',
-  label: 'Houdbaar voedselpakket',
+  label: 'Voedselpakket',
   subLabel: '2400 kcal per dag',
   image: '/images/noodpakket/voedselpakket-nood.png', 
   description: 'Kies voor echt voedsel in blik en stevige verpakkingen; voedzamer en smakelijker dan poederzakjes. Gebaseerd op het advies van het Voedingscentrum.',
@@ -208,19 +208,40 @@ const isHygieneBundleSelected = computed(() => {
 })
 
 const toggleHygieneBundle = () => {
-  if (isHygieneBundleSelected.value) {
+  const isRemoving = isHygieneBundleSelected.value
+  
+  if (isRemoving) {
     intake.value.hygiene = []
   } else {
     intake.value.hygiene = Object.keys(HYGIENE_PRICES) as any[]
   }
+
+  trackEvent('toggle_product', {
+    item_id: 'hygiene_bundle',
+    item_name: 'Hygiëne producten',
+    action: isRemoving ? 'remove' : 'add'
+  })
 }
 
 // --- Actions (Toggles etc) ---
 
 // 1. GENERIEKE OPEN FUNCTIE
-const openInfo = (product: EssentialProduct | LocalProductInfo) => {
+const openInfo = (product: any) => {
   selectedProductInfo.value = product
   showProductModal.value = true
+
+  // 1. Stuur het normale interactie event (zoals we eerder deden)
+  trackEvent('select_content', {
+    content_type: 'product_modal',
+    item_id: product.id
+  })
+
+  // 2. FORCEER EEN PAGEVIEW (Virtual Pageview)
+  // Dit vertelt Google: "De gebruiker ziet nu de pagina '/product/naam-van-product'"
+  trackEvent('page_view', {
+    page_title: `Product: ${product.label}`,
+    page_location: `${window.location.origin}/modal/${product.id}` 
+  })
 }
 
 const closeProductModal = () => {
@@ -229,37 +250,83 @@ const closeProductModal = () => {
 }
 
 // Video
-const openVideoModal = () => showVideoModal.value = true
+// Video (aangepast met tracking)
+const openVideoModal = () => {
+  showVideoModal.value = true
+  trackEvent('select_content', {
+    content_type: 'video',
+    item_name: 'Uitlegvideo noodpakket'
+  })
+}
 const closeVideoModal = () => showVideoModal.value = false
 
-// Toggles
+// Toggles (aangepast met tracking)
 const toggleEssential = (id: EssentialProductKey) => {
   const list = intake.value.selectedEssentials
-  if (list.includes(id)) {
+  const isRemoving = list.includes(id)
+
+  if (isRemoving) {
     intake.value.selectedEssentials = list.filter(item => item !== id)
   } else {
     intake.value.selectedEssentials = [...list, id]
   }
+
+  trackEvent('toggle_product', {
+    item_id: id,
+    item_category: 'essential',
+    action: isRemoving ? 'remove' : 'add'
+  })
 }
 const isEssentialSelected = (id: EssentialProductKey) => intake.value.selectedEssentials.includes(id)
 
+// Helper functie om events veilig naar Google Analytics te sturen
+const trackEvent = (eventName: string, params: Record<string, any>) => {
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', eventName, params)
+    // Voor debugging in je console (optioneel, haal weg in productie):
+    console.log(`GA Event: ${eventName}`, params) 
+  }
+}
+
 const toggleFood = () => {
-  intake.value.foodInventory = intake.value.foodInventory === 'buy' ? 'inhouse' : 'buy'
+  const isRemoving = intake.value.foodInventory === 'buy'
+  intake.value.foodInventory = isRemoving ? 'inhouse' : 'buy'
+
+  trackEvent('toggle_product', {
+    item_id: 'food_package',
+    item_name: 'Houdbaar voedselpakket',
+    action: isRemoving ? 'remove' : 'add'
+  })
 }
 const isFoodSelected = computed(() => intake.value.foodInventory === 'buy')
 
 const toggleFlightbag = () => {
-  intake.value.flightbag = intake.value.flightbag === 'yes' ? 'no' : 'yes'
+  const isRemoving = intake.value.flightbag === 'yes'
+  intake.value.flightbag = isRemoving ? 'no' : 'yes'
+
+  trackEvent('toggle_product', {
+    item_id: 'flightbag',
+    item_name: 'Vluchttas',
+    action: isRemoving ? 'remove' : 'add'
+  })
 }
 const isFlightbagSelected = computed(() => intake.value.flightbag === 'yes')
 
 const toggleTool = (option: string) => {
   const list = intake.value.tools || []
-  if (list.includes(option)) {
+  const isRemoving = list.includes(option)
+
+  if (isRemoving) {
     intake.value.tools = list.filter((o) => o !== option)
   } else {
     intake.value.tools = [...list, option]
   }
+
+  trackEvent('toggle_product', {
+    item_id: option,
+    item_category: 'tools',
+    action: isRemoving ? 'remove' : 'add'
+  })
 }
 const isToolSelected = (option: string) => Array.isArray(intake.value.tools) && intake.value.tools.includes(option)
 
@@ -272,6 +339,11 @@ const decreasePersons = () => {
 
 const goToCart = () => {
   calculatePrice()
+  trackEvent('add_to_cart', {
+    currency: 'EUR',
+    value: intake.value.price, 
+    person_count: intake.value.persons 
+  })
   navigateTo('/cart')
 }
 
@@ -299,7 +371,7 @@ watch(
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#FFFDF3] text-slate-900 pb-32">
+  <div class="min-h-screen bg-[#fff] text-slate-900 pb-32">
     <div class="max-w-6xl mx-auto px-4 md:px-6 pt-8 md:pt-12">
       
       <header class="space-y-2 mb-8 md:mb-10">
@@ -354,8 +426,8 @@ watch(
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-100">
               <div v-for="product in ESSENTIAL_PRODUCTS" :key="product.id" class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
-                <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img :src="product.image" :alt="product.label" class="w-full h-full object-cover mix-blend-multiply" />
+                <div class="w-16 h-16 shrink-0 rounded-lg bg-[#FFFDF3] overflow-hidden relative">
+                  <img :src="product.image" :alt="product.label" class="w-full h-full object-contain drop-shadow-[8px_8px_15px_rgba(0,0,0,0.1)]" />
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="openInfo(product)">
@@ -391,7 +463,7 @@ watch(
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="openInfo(FOOD_INFO)">
-                    {{ FOOD_INFO.label }} ({{ intake.persons }} pers.) ›
+                    {{ FOOD_INFO.label }} ›
                   </button>
                   
                   <div class="text-sm text-slate-500 line-clamp-1">
@@ -504,7 +576,7 @@ watch(
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <span class="text-left text-[15px] font-semibold text-slate-900 truncate">
-                    Hygiëne producten
+                    Hygiëne bundel 
                   </span>
                   
                   <div class="text-sm text-slate-500 line-clamp-1">
@@ -568,9 +640,13 @@ watch(
           <button type="button" class="text-slate-400 hover:text-slate-600" @click="closeProductModal">✕</button>
         </div>
         <div class="space-y-3">
-          <div v-if="selectedProductInfo.image" class="w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center">
-            <img :src="selectedProductInfo.image" :alt="selectedProductInfo.label" class="w-full h-full object-cover" />
-          </div>
+          <div v-if="selectedProductInfo.image" class="w-full aspect-[4/3] rounded-xl bg-[#FFFDF3] border border-slate-100 flex items-center justify-center p-8">
+            <img 
+                :src="selectedProductInfo.image" 
+                :alt="selectedProductInfo.label" 
+                class="w-full h-full object-contain drop-shadow-[10px_10px_20px_rgba(0,0,0,0.25)]" 
+              />         
+           </div>
           <p class="text-sm text-slate-700">{{ selectedProductInfo.description }}</p>
           <ul v-if="selectedProductInfo.bullets?.length" class="space-y-2">
             <li v-for="(item, index) in selectedProductInfo.bullets" :key="index" class="flex items-start gap-2 text-sm text-slate-700">
@@ -600,7 +676,7 @@ watch(
           <h3 class="text-lg font-semibold text-slate-900">Uitlegvideo noodpakket</h3>
           <button type="button" class="text-slate-400 hover:text-slate-600" @click="closeVideoModal">✕</button>
         </div>
-        <div class="aspect-video bg-slate-100 rounded-xl flex items-center justify-center text-slate-400">
+        <div class="aspect-video bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden">
            <VimeoEmbed videoId="1140837450" title="noodpakket-op-maat" />
         </div>
       </div>

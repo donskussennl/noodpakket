@@ -92,6 +92,9 @@ const pay = async () => {
             <div class="flex items-center gap-2 text-slate-700">
               <span class="text-emerald-600">✓</span> Binnen 5 werkdagen in huis
             </div>
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="text-emerald-600">✓</span> Gratis retourneren binnen 30 dagen
+            </div>
           </div>
         </div>
 

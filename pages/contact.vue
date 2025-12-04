@@ -57,7 +57,7 @@ const onSubmit = async () => {
 
 
 <template>
-  <div class="min-h-screen bg-[#FFFDF3] text-slate-900">
+  <div class="min-h-screen bg-[#fff] text-slate-900">
     <main class="max-w-4xl mx-auto px-4 md:px-6 py-12 md:py-20 space-y-16">
       <!-- Intro -->
       <section class="space-y-4">
@@ -99,13 +99,8 @@ const onSubmit = async () => {
           <div class="space-y-3">
             <h3 class="text-lg font-medium text-slate-900">E-mail</h3>
             <p class="text-sm md:text-base text-slate-700 leading-relaxed">
-              Voor vragen, opmerkingen of samenwerkingen:<br />
-              <a
-                href="mailto:info@noodpakket-op-maat.nl"
-                class="text-emerald-700 hover:text-emerald-800 underline underline-offset-2"
-              >
-                info@noodpakket-op-maat.nl
-              </a>
+              Voor vragen, opmerkingen of samenwerkingen. Vul het formulier hieronder in.<br />
+            
             </p>
           </div>
         </div>
