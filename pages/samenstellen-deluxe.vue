@@ -275,7 +275,7 @@ watch(
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#FFF] text-slate-900 pb-32">
+  <div class="min-h-screen bg-[#FFF] text-slate-900 pb-15">
     <div class="max-w-6xl mx-auto px-4 md:px-6 pt-8 md:pt-12">
       
       <header class="space-y-2 mb-8 md:mb-10">
@@ -397,7 +397,11 @@ watch(
             <div class="space-y-4">
               <details class="group bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
                 <summary class="flex items-center justify-between cursor-pointer"><span class="font-medium text-slate-900">Hoe lang kan ik doen met dit noodpakket?</span><span class="text-slate-400 group-open:rotate-180 transition-transform">⌄</span></summary>
-                <p class="mt-3 text-sm text-slate-700">Het pakket is samengesteld voor de eerste 72 uur.</p>
+                <p class="mt-3 text-sm text-slate-700">Het pakket is samengesteld voor de eerste 72 uur. Het water is een jaar houdbaar en kan je makkelijk opnieuw vulling. Het voedselpakket is 2 jaar houdbaar.</p>
+              </details>
+              <details class="group bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
+                <summary class="flex items-center justify-between cursor-pointer"><span class="font-medium text-slate-900">Waarom bestel ik bij Noodpakket-op-maat.nl?</span><span class="text-slate-400 group-open:rotate-180 transition-transform">⌄</span></summary>
+                <p class="mt-3 text-sm text-slate-700">Geen onzin producten, alleen producten die op de checklist van de overheid staan. Kies alleen de producten die je nog niet in huis hebt of op 1 plek hebt liggen. Altijd voor de beste prijs.</p>
               </details>
               <details class="group bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
                 <summary class="flex items-center justify-between cursor-pointer"><span class="font-medium text-slate-900">Kan ik het noodpakket later nog aanvullen?</span><span class="text-slate-400 group-open:rotate-180 transition-transform">⌄</span></summary>
@@ -525,8 +529,8 @@ watch(
           <h3 class="text-lg font-semibold text-slate-900">Uitlegvideo noodpakket</h3>
           <button type="button" class="text-slate-400 hover:text-slate-600" @click="closeVideoModal">✕</button>
         </div>
-        <div class="aspect-video bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden">
-           <VimeoEmbed videoId="1140837450" title="noodpakket-op-maat" />
+        <div class="w-full bg-slate-100 rounded-xl overflow-hidden text-slate-400">
+          <VimeoEmbed videoId="1140837450" title="noodpakket-op-maat" />
         </div>
       </div>
     </div>
