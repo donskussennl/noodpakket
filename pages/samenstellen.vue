@@ -602,11 +602,11 @@ watch(
             <div class="space-y-4">
               <details class="group bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
                 <summary class="flex items-center justify-between cursor-pointer"><span class="font-medium text-slate-900">Hoe lang kan ik doen met dit noodpakket?</span><span class="text-slate-400 group-open:rotate-180 transition-transform">⌄</span></summary>
-                <p class="mt-3 text-sm text-slate-700">Het pakket is samengesteld voor de eerste 72 uur. Het water is een jaar houdbaar en kan je makkelijk opnieuw vulling. Het voedselpakket is 2 jaar houdbaar.</p>
+                <p class="mt-3 text-sm text-slate-700">Het pakket is samengesteld voor de eerste 72 uur. Het water is een jaar houdbaar en kan je elk jaar verversen. Het voedselpakket is 2 jaar houdbaar.</p>
               </details>
               <details class="group bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
                 <summary class="flex items-center justify-between cursor-pointer"><span class="font-medium text-slate-900">Waarom bestel ik bij Noodpakket-op-maat.nl?</span><span class="text-slate-400 group-open:rotate-180 transition-transform">⌄</span></summary>
-                <p class="mt-3 text-sm text-slate-700">Geen onzin producten, alleen producten die op de checklist van de overheid staan. Kies alleen de producten die je nog niet in huis hebt of op 1 plek hebt liggen. Altijd voor de beste prijs.</p>
+                <p class="mt-3 text-sm text-slate-700">Je besteld alleen producten die op de checklist van de overheid staan. Kies  de producten die je nog niet in huis hebt of op 1 plek hebt liggen. Altijd voor de beste prijs.</p>
               </details>
               <details class="group bg-white border border-slate-200 rounded-2xl p-5 shadow-soft">
                 <summary class="flex items-center justify-between cursor-pointer"><span class="font-medium text-slate-900">Kan ik het noodpakket later nog aanvullen?</span><span class="text-slate-400 group-open:rotate-180 transition-transform">⌄</span></summary>
