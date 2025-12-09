@@ -223,12 +223,18 @@ const getProductLabel = (product?: EssentialProduct | LocalProductInfo | null) =
   }
   return product.label
 }
-
 const getProductPrice = (product: EssentialProduct) => {
   const persons = intake.value.persons || 1
   const price = product.multiplies ? product.price * persons : product.price
-  return formatPriceDot(price)
+  return price.toFixed(2)
 }
+const getProductOriginalPrice = (product: EssentialProduct) => {
+  const persons = intake.value.persons || 1
+  const price = product.multiplies ? product.price * persons : product.price
+  const original = price / 0.75        // 25% korting → je betaalt 75%
+  return original.toFixed(2)
+}
+
 
 // Hygiëne Bundel Helpers
 const hygieneBundlePrice = computed(() => {
@@ -494,8 +500,13 @@ watch(
                     {{ product.subLabel }}
                   </div>
 
-                  <div class="text-sm font-medium text-slate-900">
-                    {{ getProductPrice(product) }}
+                  <div class="text-sm font-medium">
+                    <span class="text-slate-400 line-through mr-1">
+                       {{ getProductOriginalPrice(product) }}
+                    </span>
+                    <span class="text-red-600">
+                       {{ getProductPrice(product) }}
+                    </span>
                   </div>
                 </div>
                 <div class="shrink-0 pr-1">
