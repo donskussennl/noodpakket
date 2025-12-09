@@ -34,22 +34,22 @@ interface IntakeState {
 }
 
 // Prijzen configuratie
-const FOOD_PACKAGE_PRICE = 15.51
-const FLIGHTBAG_PRICE = 24.79        
+const FOOD_PACKAGE_PRICE = 15.90
+const FLIGHTBAG_PRICE = 24.90        
 
 const HYGIENE_PRICES: Record<HygieneOption, number> = {
-  handgel: 1.65,
-  wcpapier: 0.63,
-  doekjes: 1.65,
-  tandenborstel: 1.65,
+  handgel: 1.50,
+  wcpapier: 0.50,
+  doekjes: 1.50,
+  tandenborstel: 1.50,
   maandverband: 1.00,
 }
 
 const TOOL_PRICES: Record<ToolsOption, number> = {
   hammer: 5.79,
-  tang: 4.63,
-  saw: 5.78,
-  opener: 3.01
+  tang: 4.90,
+  saw: 5.90,
+  opener: 2.90
 }
 
 export const useIntake = () => {

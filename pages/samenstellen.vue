@@ -9,6 +9,30 @@ import {
   type BulletItem // Zorg dat deze geëxporteerd is in essentialProducts.ts
 } from '~/data/essentialProducts'
 
+useHead({
+  title: 'Noodpakket samenstellen - Laagste prijs van NL | Noodpakket-op-maat.nl',
+  meta: [
+    {
+      name: 'description',
+      content:
+        'Stel je eigen noodpakket samen op basis van de checklist van de overheid. Kies alleen de noodartikelen die je nog niet in huis hebt en bestel direct.'
+    },
+    {
+      property: 'og:title',
+      content: 'Noodpakket samenstellen | Noodpakket-op-maat.nl'
+    },
+    {
+      property: 'og:description',
+      content:
+        'Maak een compleet noodpakket op maat. Producten volgens de checklist van de overheid, snel geleverd en alleen wat jij nodig hebt.'
+    },
+    {
+      property: 'og:type',
+      content: 'website'
+    }
+  ]
+})
+
 // --- Interface voor lokale producten ---
 interface LocalProductInfo {
   id: string
@@ -18,6 +42,14 @@ interface LocalProductInfo {
   description: string
   bullets: BulletItem[]
 }
+
+const originalPrice = computed(() => {
+  return intake.value.price / 0.75  // want 25% korting → je betaalt 75%
+})
+
+const discountAmount = computed(() => {
+  return originalPrice.value - intake.value.price
+})
 
 // --- State ---
 const showProductModal = ref(false)
@@ -377,7 +409,11 @@ watch(
       <header class="space-y-2 mb-8 md:mb-10">
         <div class="space-y-1">
           <p class="text-sm font-medium tracking-wide uppercase text-emerald-700"> Meer dan 5,5 miljoen Nederlanders zijn al voorbereid </p>
-          <h1 class="text-xl md:text-3xl font-semibold">Noodpakket compleet op basis van de checklist van de overheid</h1>
+          <h1 class="text-xl md:text-3xl font-semibold">Noodpakket - Bereid je voor op basis van de checklist van de overheid</h1>
+          <p class="mt-2 text-sm text-slate-700 max-w-2xl">
+            Kies zelf welke noodartikelen je nodig hebt voor de eerste 72 uur. Je betaalt alleen voor producten die je nog niet in huis hebt,
+            volledig volgens het advies van de overheid.
+          </p>
         </div>
         
         <div class="mt-3 md:hidden">
@@ -395,24 +431,44 @@ watch(
             </div>
           </button>
         </div>
+         <div
+      class="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-100 px-3 py-1 mt-2 text-[11px] font-semibold text-emerald-800"
+    >
+      <span class="text-xs">🔥</span>
+      <span>Tijdelijk 25% korting op alle producten • beperkte voorraad</span>
+    </div>
       </header>
+     
 
       <div class="grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)] gap-8 lg:gap-12">
         <aside class="md:sticky md:top-8 self-start space-y-6">
           <div class="flex flex-col items-center">
             
             <div class="hidden md:block w-full rounded-2xl bg-slate-100 overflow-hidden shadow-sm border border-slate-100">
-              <VimeoEmbed videoId="1140837450" title="noodpakket-op-maat" />
+              <VimeoEmbed videoId="1144930981" title="noodpakket-op-maat" />
             </div>
 
             <div class="mt-4 w-full border-t border-slate-100 pt-4 grid grid-cols-2 gap-3 text-xs">
-              <div class="flex items-start gap-2">
-                <span class="text-emerald-600">✓</span><div><p class="font-medium">30 dagen retourneren</p></div>
-              </div>
-              <div class="flex items-start gap-2">
-                <span class="text-emerald-600">✓</span><div><p class="font-medium">Gratis bezorgd binnen 5 werkdagen</p></div>
-              </div>
+            <div class="flex items-start gap-2">
+              <span class="text-emerald-600">✓</span>
+              <p class="font-medium">LAAGSTE PRIJS van NL!</p>
             </div>
+            <div class="flex items-start gap-2">
+              <span class="text-emerald-600">✓</span>
+              <p class="font-medium">Gratis bezorgd binnen 5 werkdagen</p>
+            </div>
+          </div>
+
+          <!-- Logo groter + betere positie -->
+          <div class="mt-5 flex justify-center md:justify-start">
+            <img 
+              src="/images/webwinkel-keur.webp"
+              alt="WebwinkelKeur"
+              class="h-20 w-auto opacity-95"
+              loading="lazy"
+            />
+          </div>
+
           </div>
         </aside>
 
@@ -421,7 +477,7 @@ watch(
           <section class="space-y-4">
             <div class="space-y-1">
               <h2 class="text-xl md:text-2xl font-semibold">Essentiële producten</h2>
-              <p class="text-sm text-slate-600">Voor de eerste 72 uur tijdens een noodgeval.</p>
+              <p class="text-sm text-slate-600">Klik op het vinkje als je het product al hebt.</p>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-100">
@@ -459,7 +515,7 @@ watch(
               
               <div class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
                 <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img :src="FOOD_INFO.image" :alt="FOOD_INFO.label" class="w-full h-full object-cover mix-blend-multiply" />
+                  <img :src="FOOD_INFO.image" :alt="FOOD_INFO.label" class="w-full h-full object-cover mix-blend-multiply" loading="lazy" />
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="openInfo(FOOD_INFO)">
@@ -483,7 +539,7 @@ watch(
 
               <div class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
                 <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img :src="FLIGHTBAG_INFO.image" :alt="FLIGHTBAG_INFO.label" class="w-full h-full object-cover mix-blend-multiply" />
+                  <img :src="FLIGHTBAG_INFO.image" :alt="FLIGHTBAG_INFO.label" class="w-full h-full object-cover mix-blend-multiply" loading="lazy" />
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <button type="button" class="text-left text-[15px] font-semibold text-slate-900 truncate hover:underline" @click="openInfo(FLIGHTBAG_INFO)">
@@ -511,7 +567,7 @@ watch(
                  class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors"
               >
                 <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img :src="tool.image" :alt="tool.label" class="w-full h-full object-cover mix-blend-multiply" />
+                  <img :src="tool.image" :alt="tool.label" class="w-full h-full object-cover mix-blend-multiply" loading="lazy" />
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="openInfo(tool)">
@@ -548,7 +604,7 @@ watch(
                  class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors"
               >
                 <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img :src="tool.image" :alt="tool.label" class="w-full h-full object-cover mix-blend-multiply" />
+                  <img :src="tool.image" :alt="tool.label" class="w-full h-full object-cover mix-blend-multiply" loading="lazy" />
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <button type="button" class="text-left text-[15px] font-semibold text-slate-900 hover:underline truncate" @click="openInfo(tool)">
@@ -572,7 +628,7 @@ watch(
 
               <div class="flex items-center gap-4 p-4 hover:bg-slate-50/50 transition-colors">
                 <div class="w-16 h-16 shrink-0 rounded-lg bg-slate-100 overflow-hidden relative">
-                  <img src="/images/noodpakket/hygiene-producten.png" alt="Hygiëne" class="w-full h-full object-cover mix-blend-multiply" />
+                  <img src="/images/noodpakket/hygiene-producten.png" alt="Hygiëne" class="w-full h-full object-cover mix-blend-multiply" loading="lazy" />
                 </div>
                 <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                   <span class="text-left text-[15px] font-semibold text-slate-900 truncate">
@@ -594,6 +650,41 @@ watch(
                 </div>
               </div>
 
+            </div>
+          </section>
+
+          <!-- Samenvatting + CTA net boven FAQ -->
+          <section class="mt-10">
+            <div
+              class="bg-white rounded-2xl border border-slate-200 shadow-sm px-4 py-4 md:px-6 md:py-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4"
+            >
+              <div class="flex items-center gap-4">
+                <div class="flex flex-col gap-1">
+             
+                  <div class="flex items-center gap-3">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-900">
+                      {{ intake.persons }} {{ intake.persons === 1 ? 'persoon' : 'personen' }}
+                    </span>
+                    <div class="flex flex-col">
+                      <span class="text-lg md:text-xl font-bold text-slate-900">
+                        € {{ formatPriceDot(intake.price) }}
+                      </span>
+
+                      <span class="text-xs text-red-700 font-medium">
+                        Je bespaart € {{ formatPriceDot(discountAmount) }} (25% korting)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="w-full md:w-auto inline-flex justify-center items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-base font-bold text-white shadow-md hover:bg-emerald-700 transition active:scale-95"
+                @click="goToCart"
+              >
+                In winkelmandje
+              </button>
             </div>
           </section>
 
@@ -627,7 +718,7 @@ watch(
             <span class="text-base font-semibold text-slate-900 min-w-[4.5rem] text-center">{{ intake.persons }} {{ intake.persons === 1 ? 'persoon' : 'personen' }}</span>
             <button @click="increasePersons" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors" :class="{'opacity-50 cursor-not-allowed': intake.persons >= 10}" :disabled="intake.persons >= 10">+</button>
           </div>
-          <div class="text-xs font-medium text-slate-500">Totaal: <span class="text-slate-900">€ {{ formatPriceDot(intake.price) }}</span></div>
+          <div class="text-xs font-medium text-slate-500">Prijs noodpakket: <span class="text-slate-900">€ {{ formatPriceDot(intake.price) }}</span></div>
         </div>
         <button type="button" class="flex-1 md:flex-none md:min-w-[200px] inline-flex justify-center items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-base font-bold text-white shadow-md hover:bg-emerald-700 transition active:scale-95" @click="goToCart">In winkelmandje</button>
       </div>
@@ -656,7 +747,7 @@ watch(
             <li v-for="(item, index) in selectedProductInfo.bullets" :key="index" class="flex items-start gap-2 text-sm text-slate-700">
               <span class="mt-[2px] text-lg leading-none">
                 <template v-if="item.type === 'check'">✔️</template>
-                <template v-else-if="item.type === 'cross'">❌</template>
+                <template v-else-if="item.type === 'cross'">✔️</template>
                 <template v-else>•</template>
               </span>
               <span v-if="item.html" v-html="item.html"></span>
@@ -681,7 +772,7 @@ watch(
           <button type="button" class="text-slate-400 hover:text-slate-600" @click="closeVideoModal">✕</button>
         </div>
         <div class="w-full bg-slate-100 rounded-xl overflow-hidden text-slate-400">
-          <VimeoEmbed videoId="1140837450" title="noodpakket-op-maat" />
+          <VimeoEmbed videoId="1144930981" title="noodpakket-op-maat" />
         </div>
       </div>
     </div>

@@ -38,7 +38,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Wateropslag',
     image: '/images/noodpakket/wateropslag.png',
     description: 'Deze watervoorziening geeft tijdens een noodsituatie direct toegang tot schoon drinkwater. De watervoorziening bevat 72 uur aan drinkwater voor 1 persoon.',
-    price: 9.90,
+    price: 7.90,
     subLabel: '9 liter',
     multiplies: true,
     bullets: [
@@ -53,7 +53,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'FM-Noodradio',
     image: '/images/noodpakket/noodradio.png',
     description: `Met deze noodradio blijf je op de hoogte van belangrijke berichten van overheid en hulpdiensten.`,
-    price: 23.06,
+    price: 19.90,
     subLabel: 'op AAA-batterijen',
     multiplies: false,
     bullets: [
@@ -67,7 +67,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Powerbank',
     image: '/images/noodpakket/powerbank.png',
     description: 'Met deze powerbank blijft je telefoon bereikbaar voor bellen, berichten en informatie.',
-    price: 21.32,
+    price: 19.90,
     subLabel: '3x je telefoon opladen',
     multiplies: false,
     bullets: [
@@ -81,7 +81,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Deken + kussen',
     image: '/images/noodpakket/blanket.png',
     description: 'Zorg voor voldoende warmte en comfort bij stroomuitval of een noodsituatie.',
-    price: 9.83,
+    price: 9.90,
     subLabel: 'Extra warm',
     multiplies: true,
     bullets: [
@@ -137,7 +137,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'EHBO-kit',
     image: '/images/noodpakket/ehbo-kit.png',
     description: 'Een compacte maar complete EHBO-kit voor kleine verwondingen.',
-    price: 8.26,
+    price: 7.90,
     subLabel: 'O.a. Pleister, gaas, tape en verband.',
     multiplies: false,
     bullets: [
@@ -151,7 +151,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Aanstekers',
     image: '/images/noodpakket/aansteker.png',
     description: 'Aanstekers geven je de zekerheid dat je altijd vuur kunt maken.',
-    price: 1.40,
+    price: 1.50,
     subLabel: '3 stuks',
     multiplies: false,
     bullets: [
@@ -164,7 +164,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Kaarsen',
     image: '/images/noodpakket/kaarsen.png',
     description: 'Noodkaarsen geven langdurig licht tijdens stroomuitval.',
-    price: 0.72,
+    price: 0.90,
     subLabel: '12 stuks',
     multiplies: false,
     bullets: [
@@ -178,25 +178,12 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     label: 'Noodfluitje',
     image: '/images/noodpakket/fluit.png',
     description: 'Met een noodfluitje kun je jezelf hoorbaar maken.',
-    price: 3.80,
+    price: 3.65,
     subLabel: 'Metaal',
     multiplies: false,
     bullets: [
       { type: 'check', text: 'Luid en ver hoorbaar, zelfs over grote afstand' },
       { type: 'check', text: 'Geen stroom of batterijen nodig' }
-    ]
-  },
-  {
-    id: 'touw',
-    label: 'Touw',
-    image: '/images/noodpakket/touw.png',
-    description: 'Een stevig stuk multifunctioneel touw is onmisbaar.',
-    price: 3.31,
-    subLabel: '100 meter',
-    multiplies: false,
-    bullets: [
-      { type: 'check', text: 'Veelzijdig inzetbaar voor noodreparaties' },
-      { type: 'check', text: 'Lichtgewicht maar sterk' }
     ]
   }
 ]

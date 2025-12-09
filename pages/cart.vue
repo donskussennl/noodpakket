@@ -35,9 +35,19 @@ const touchCurrentId = ref<string | null>(null)
 // --- Helpers ---
 const formatPrice = (price: number) => price.toFixed(2)
 
+
 const formatPriceKomma = (price: number) => {
   return price.toFixed(2).replace('.', ',')
 }
+
+const originalTotal = computed(() => {
+  // 25% korting → je betaalt 75% van de originele prijs
+  return intake.value.price / 0.75
+})
+
+const discountAmount = computed(() => {
+  return originalTotal.value - intake.value.price
+})
 
 // Helper om aantallen te tellen in een array
 const countOccurrences = (arr: string[]) => {
@@ -384,22 +394,29 @@ watch(intake, () => calculatePrice(), { deep: true })
         </div>
       </div>
 
-      <div class="mt-6 pt-6 border-t border-slate-100 space-y-3 pb-8">
+    <div class="mt-6 pt-6 border-t border-slate-100 space-y-3 pb-8">
         <div class="flex justify-between items-center text-sm">
-          <span class="text-slate-500">Totaal goederen</span>
-          <span class="font-medium text-slate-900">{{ formatPrice(intake.price) }}</span>
+            <span class="text-slate-500">Normale prijs</span>
+            <span class="font-medium text-slate-900">€ {{ formatPrice(originalTotal) }}</span>
+        </div>
+
+        <div class="flex justify-between items-center text-sm">
+            <span class="text-slate-500">Korting (25%)</span>
+            <span class="font-medium text-red-700">- € {{ formatPrice(discountAmount) }}</span>
         </div>
         
         <div class="flex justify-between items-center text-sm">
-          <span class="text-slate-500">Bezorging</span>
-          <span class="font-medium text-emerald-600">Altijd gratis</span>
+            <span class="text-slate-500">Bezorging</span>
+            <span class="font-medium text-emerald-600">Altijd gratis</span>
         </div>
 
         <div class="flex justify-between items-center text-lg pt-2 border-t border-slate-50 mt-2">
-          <span class="font-medium text-slate-900">Te betalen</span>
-          <span class="font-bold text-slate-900">{{ formatPrice(intake.price) }}</span>
+            <span class="font-medium text-slate-900">Totaal Noodpakket</span>
+            <span class="font-bold text-slate-900">€ {{ formatPrice(intake.price) }}</span>
         </div>
-      </div>
+    </div>
+
+
 
       <div class="flex items-center justify-center gap-4 opacity-40 grayscale pb-4">
         <img src="/images/ideal.svg" alt="iDEAL" class="h-5 w-auto" />
