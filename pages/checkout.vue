@@ -3,7 +3,7 @@ const {
   intake,
   calculatePrice,
 } = useIntake()
-
+import { SpeedInsights } from "@vercel/speed-insights/nuxt"
 const loading = ref(false)
 const error = ref<string | null>(null)
 const hasTriedPay = ref(false)

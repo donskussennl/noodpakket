@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Zorg dat VimeoEmbed.vue in je /components map staat
 // import VimeoEmbed from '~/components/VimeoEmbed.vue'
-
+import { SpeedInsights } from "@vercel/speed-insights/nuxt"
 import {
   ESSENTIAL_PRODUCTS,
   type EssentialProductKey,

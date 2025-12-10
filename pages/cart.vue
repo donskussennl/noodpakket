@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ESSENTIAL_PRODUCTS } from '~/data/essentialProducts'
-
+import { SpeedInsights } from "@vercel/speed-insights/nuxt"
 // --- Intake Data ---
 const {
   intake,

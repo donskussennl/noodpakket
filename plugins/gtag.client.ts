@@ -1,20 +1,33 @@
 export default defineNuxtPlugin(() => {
+  // Alleen in de browser
   if (typeof window === 'undefined') return;
 
-  // Load GA4 script dynamically
+  const id = 'G-W4K1B0FNL2';
+
+  // Script-tag aanmaken
   const script = document.createElement('script');
   script.async = true;
-  script.src = "https://www.googletagmanager.com/gtag/js?id=G-W4K1B0FNL2";
-  document.head.appendChild(script);
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
 
-  // Initialize datalayer
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = function () {
-    window.dataLayer.push(arguments);
+  script.onload = () => {
+    console.log('✅ gtag.js succesvol geladen');
   };
 
-  window.gtag('js', new Date());
-  window.gtag('config', 'G-W4K1B0FNL2', { send_page_view: false });
+  script.onerror = (err) => {
+    console.error('❌ gtag.js kon niet geladen worden', err);
+  };
 
-  console.log('GA4 LOADED');
+  document.head.appendChild(script);
+
+  const w = window as any;
+  w.dataLayer = w.dataLayer || [];
+  w.gtag = function (...args: any[]) {
+    w.dataLayer.push(args);
+  };
+
+  w.gtag('js', new Date());
+  // Laat send_page_view AAN voor debugging
+  w.gtag('config', id);
+
+  console.log('🚀 GA4 plugin geïnitialiseerd met ID', id);
 });

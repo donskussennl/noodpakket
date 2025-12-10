@@ -72,7 +72,7 @@
           </div>
         </div>
       </footer>
-
+    <Analytics />
     </div>
 
   </NuxtLayout>
@@ -80,6 +80,7 @@
 
 
 <script setup lang="ts">
+
 const mobileOpen = ref(false)
 const closeMobile = () => {
   mobileOpen.value = false
