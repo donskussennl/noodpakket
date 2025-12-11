@@ -7,10 +7,10 @@ export default defineNuxtConfig({
 
   // --- NIEUW STUKJE: Hier moet je ID staan ---
   gtag: {
-    id: 'G-W4K1B0FNL2', // <-- Plak hier het ID uit Google Analytics (bijv. G-XZ123456)
+    id: process.env.NUXT_PUBLIC_GA_ID, // <-- Plak hier het ID uit Google Analytics (bijv. G-XZ123456)
     loadingStrategy: 'async',
     enabled: true,      // expliciet
-    initMode: 'auto'
+    initMode: 'auto',
   },
   // ------------------------------------------
 

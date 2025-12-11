@@ -51,15 +51,15 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'radio',
     label: 'FM-Noodradio',
-    image: '/images/noodpakket/noodradio.png',
+    image: '/images/noodpakket/noodradio-batterijen.png',
     description: `Met deze noodradio blijf je op de hoogte van belangrijke berichten van overheid en hulpdiensten.`,
     price: 19.90,
     subLabel: 'op AAA-batterijen',
     multiplies: false,
     bullets: [
-      {type: 'check', text: 'Werkt op batterijen'},
+      {type: 'check', text: 'Werkt tot wel 40 uur op 2 batterijen'},
       {type: 'check', text: 'Ontvangt FM-noodberichten'},
-      {type: 'cross', html: `Geen zon of fysieke kracht nodig.`}
+      {type: 'cross', html: `Geen zon of fysieke kracht nodig`}
     ]
   },
   {
@@ -71,7 +71,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     subLabel: '3x je telefoon opladen',
     multiplies: false,
     bullets: [
-      {type: 'check', text: 'Meerdere telefoonladingen'},
+      {type: 'check', text: '3x je telefoon op laden'},
       {type: 'check', text: 'Compact en makkelijk mee te nemen'},
       {type: 'check', text: 'Blijf in contact met familie en nooddiensten'}
     ]
@@ -113,8 +113,8 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     subLabel: 'op AAA-batterijen',
     multiplies: false,
     bullets: [
-      { type: 'check', text: 'Werkt op batterijen of is op te laden' },
-      { type: 'check', text: 'Lange brandduur' },
+      { type: 'check', text: 'Werkt op AAA batterijen' },
+      { type: 'check', text: 'Brand minstens lang genoeg voor de eerste 72 uur tijdens een noodsituatie' },
       { type: 'check', text: 'Sterke, heldere lichtbundel' }
     ]
   },
@@ -155,7 +155,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
     subLabel: '3 stuks',
     multiplies: false,
     bullets: [
-      { type: 'check', text: 'Werkt ook zonder stroom of batterijen' },
+      { type: 'check', text: 'Werkt zonder stroom of batterijen' },
       { type: 'check', text: 'Waterbestendige verpakking voor extra veiligheid' }
     ]
   },
