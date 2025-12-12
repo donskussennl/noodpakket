@@ -1,9 +1,10 @@
 // server/api/mollie-webhook.post.ts
 import { createMollieClient } from '@mollie/api-client'
+import { ESSENTIAL_PRODUCTS } from '~/data/essentialProducts'
 import { sendMail } from '../utils/sendMail' // pad: server/api -> ../utils/sendMail
 
-// Zelfde labels als in je cart-component
-const hygieneLabels: Record<string, string> = {
+// Optionele add-ons (nog uit useIntake.ts)
+const HYGIENE_LABELS: Record<string, string> = {
   handgel: 'Handgel',
   wcpapier: 'Wc-papier',
   doekjes: 'Natte doekjes',
@@ -11,170 +12,213 @@ const hygieneLabels: Record<string, string> = {
   maandverband: 'Maandverband',
 }
 
-const toolLabels: Record<string, string> = {
+const TOOL_LABELS: Record<string, string> = {
   hammer: 'Hamer',
+  tang: 'Tang',
   saw: 'Zaag',
-  tang: 'Kniptang',
   opener: 'Blikopener',
 }
 
-function getFoodInventoryLabel(meta: any): string {
-  const inv = meta?.foodInventory
-  if (inv === 'inhouse') return 'Geen voedselpakket'
-  if (inv === 'shoppinglist') return 'Ik koop zelf nog voedsel'
-  if (inv === 'buy') {
-    const count = meta?.foodPackages ?? meta?.persons ?? 1
-    return `Noodvoedingspakket voor 72 uur (${count} pakket${count === 1 ? '' : 'ten'})`
-  }
-  return '-'
+type MetaAddress = {
+  firstName?: string
+  lastName?: string
+  email?: string
+  street?: string
+  houseNumber?: string
+  postalCode?: string
+  city?: string
+  country?: string
+  phone?: string
 }
 
-function buildItemsSummaryText(meta: any, amount: string): string {
-  const persons = meta?.persons ?? '-'
-  const hygiene = Array.isArray(meta?.hygiene) ? meta.hygiene : []
-  const tools = Array.isArray(meta?.tools) ? meta.tools : []
+type PaymentMeta = {
+  persons?: number
+  selectedEssentials?: string[] // EssentialProductKey[], maar keep it flexible voor webhook
+  hygiene?: string[]
+  tools?: string[]
+  foodPackages?: number | null
+  flightbag?: 'yes' | 'no' | boolean | null
+  address?: MetaAddress
 
-  const lines: string[] = []
-
-  lines.push(`Aantal personen: ${persons}`)
-  lines.push(`Totaalbedrag: € ${amount}`)
-  lines.push('')
-  lines.push('Noodpakket basis:')
-  lines.push('- Noodradio')
-  lines.push(`- Watervoorziening voor ${persons} personen`)
-  lines.push('- EHBO-set')
-  lines.push('- Deken')
-  lines.push('- Kussen')
-  lines.push('- Zaklamp')
-  lines.push('- Batterijen')
-  lines.push('- Powerbank')
-  lines.push('')
-  lines.push(`Voedselpakket: ${getFoodInventoryLabel(meta)}`)
-  lines.push(`Vluchttas: ${meta?.flightbag === 'yes' ? 'Ja' : 'Geen vluchttas'}`)
-
-  if (hygiene.length) {
-    lines.push('')
-    lines.push('Hygiëne:')
-    hygiene.forEach((key: string) => {
-      lines.push(`- ${hygieneLabels[key] || key}`)
-    })
-  }
-
-  if (tools.length) {
-    lines.push('')
-    lines.push('Noodgereedschap:')
-    tools.forEach((key: string) => {
-      lines.push(`- ${toolLabels[key] || key}`)
-    })
-  }
-
-  return lines.join('\n')
+  // backward compatibility (oude structuur)
+  essentials?: string[]
+  items?: Array<{ id: string; qty?: number }>
 }
 
-function buildItemsSummaryHtml(meta: any, amount: string): string {
-  const persons = meta?.persons ?? '-'
-  const hygiene = Array.isArray(meta?.hygiene) ? meta.hygiene : []
-  const tools = Array.isArray(meta?.tools) ? meta.tools : []
-
-  const hygieneHtml = hygiene.length
-    ? `
-      <div style="margin-top:12px;">
-        <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#111827;">Hygiëne</p>
-        <ul style="margin:0;padding-left:18px;font-size:13px;color:#4b5563;">
-          ${hygiene
-            .map(
-              (key: string) =>
-                `<li>${hygieneLabels[key] || key}</li>`,
-            )
-            .join('')}
-        </ul>
-      </div>
-    `
-    : ''
-
-  const toolsHtml = tools.length
-    ? `
-      <div style="margin-top:12px;">
-        <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#111827;">Noodgereedschap</p>
-        <ul style="margin:0;padding-left:18px;font-size:13px;color:#4b5563;">
-          ${tools
-            .map(
-              (key: string) =>
-                `<li>${toolLabels[key] || key}</li>`,
-            )
-            .join('')}
-        </ul>
-      </div>
-    `
-    : ''
-
-  return `
-    <table cellpadding="0" cellspacing="0" style="width:100%;margin-top:8px;margin-bottom:16px;font-size:14px;color:#111827;">
-      <tr>
-        <td style="padding:4px 0;color:#6b7280;">Aantal personen</td>
-        <td style="padding:4px 0;text-align:right;font-weight:500;color:#111827;">${persons}</td>
-      </tr>
-      <tr>
-        <td style="padding:4px 0;color:#6b7280;">Totaalbedrag</td>
-        <td style="padding:4px 0;text-align:right;font-weight:600;color:#047857;">€ ${amount}</td>
-      </tr>
-    </table>
-
-    <div style="margin-top:8px;margin-bottom:8px;">
-      <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#111827;">
-        Noodpakket basis
-      </p>
-      <ul style="margin:0;padding-left:18px;font-size:13px;color:#4b5563;">
-        <li>Noodradio</li>
-        <li>Watervoorziening voor ${persons} personen</li>
-        <li>EHBO-set</li>
-        <li>Deken</li>
-        <li>Kussen</li>
-        <li>Zaklamp</li>
-        <li>Batterijen</li>
-        <li>Powerbank</li>
-      </ul>
-    </div>
-
-    <div style="margin-top:8px;margin-bottom:8px;">
-      <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#111827;">
-        Voedselpakket
-      </p>
-      <p style="margin:0;font-size:13px;color:#4b5563;">
-        ${getFoodInventoryLabel(meta)}
-      </p>
-    </div>
-
-    <div style="margin-top:8px;margin-bottom:8px;">
-      <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#111827;">
-        Vluchttas
-      </p>
-      <p style="margin:0;font-size:13px;color:#4b5563;">
-        ${meta?.flightbag === 'yes' ? 'Ja, vluchttas toegevoegd' : 'Geen vluchttas'}
-      </p>
-    </div>
-
-    ${hygieneHtml}
-    ${toolsHtml}
-  `
-}
-
-function escapeHtml(str: string): string {
-  return str
+function escapeHtml(input: string) {
+  return (input ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+}
+
+const essentialMap = Object.fromEntries(ESSENTIAL_PRODUCTS.map(p => [p.id, p]))
+
+function getSelectedEssentials(meta: PaymentMeta): string[] {
+  if (Array.isArray(meta?.selectedEssentials)) return meta.selectedEssentials
+  if (Array.isArray(meta?.essentials)) return meta.essentials
+  if (Array.isArray(meta?.items)) return meta.items.map(i => i.id).filter(Boolean)
+  return []
+}
+
+function toBoolYes(value: any): boolean {
+  if (value === true) return true
+  if (value === 'yes') return true
+  if (value === 'true') return true
+  return false
+}
+
+function countById(ids: string[]): Record<string, number> {
+  return ids.reduce((acc, id) => {
+    acc[id] = (acc[id] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+}
+
+function buildItemsSummaryText(meta: PaymentMeta, amount: string): string {
+  const persons = Number(meta?.persons ?? 1) || 1
+  const selected = getSelectedEssentials(meta)
+  const essentialsCount = countById(selected)
+
+  const hygiene = Array.isArray(meta?.hygiene) ? meta.hygiene : []
+  const tools = Array.isArray(meta?.tools) ? meta.tools : []
+  const foodPackages = meta?.foodPackages ?? null
+  const flightbag = toBoolYes(meta?.flightbag)
+
+  const lines: string[] = []
+  lines.push(`Aantal personen: ${persons}`)
+  lines.push(`Totaalbedrag: € ${amount}`)
+  lines.push('')
+
+  // Essentials
+  if (Object.keys(essentialsCount).length) {
+    lines.push('Essentials:')
+    for (const [id, baseQty] of Object.entries(essentialsCount)) {
+      const product = essentialMap[id]
+      if (!product) {
+        lines.push(`- ${id} (${baseQty}×)`)
+        continue
+      }
+      const qty = baseQty * (product.multiplies ? persons : 1)
+      const spec = product.subLabel ? ` (${product.subLabel})` : ''
+      lines.push(`- ${product.label}${spec} (${qty}×)`)
+    }
+    lines.push('')
+  }
+
+  // Food packages
+  if (foodPackages && Number(foodPackages) > 0) {
+    lines.push(`Voedselpakketten: ${foodPackages}×`)
+    lines.push('')
+  }
+
+  // Hygiene
+  if (hygiene.length) {
+    lines.push('Hygiëne:')
+    hygiene.forEach(key => lines.push(`- ${HYGIENE_LABELS[key] || key}`))
+    lines.push('')
+  }
+
+  // Tools
+  if (tools.length) {
+    lines.push('Tools:')
+    tools.forEach(key => lines.push(`- ${TOOL_LABELS[key] || key}`))
+    lines.push('')
+  }
+
+  // Flightbag
+  if (flightbag) {
+    lines.push('Vluchttas: Ja')
+    lines.push('')
+  }
+
+  return lines.join('\n').trim()
+}
+
+function buildItemsSummaryHtml(meta: PaymentMeta, amount: string): string {
+  const persons = Number(meta?.persons ?? 1) || 1
+  const selected = getSelectedEssentials(meta)
+  const essentialsCount = countById(selected)
+
+  const hygiene = Array.isArray(meta?.hygiene) ? meta.hygiene : []
+  const tools = Array.isArray(meta?.tools) ? meta.tools : []
+  const foodPackages = meta?.foodPackages ?? null
+  const flightbag = toBoolYes(meta?.flightbag)
+
+  const section = (title: string, inner: string) => `
+    <div style="margin-top:14px;">
+      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#111827;">${escapeHtml(title)}</p>
+      ${inner}
+    </div>
+  `
+
+  const list = (items: string[]) => `
+    <ul style="margin:0;padding-left:18px;color:#111827;font-size:13px;line-height:1.5;">
+      ${items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}
+    </ul>
+  `
+
+  const parts: string[] = []
+
+  // Totals block
+  parts.push(`
+    <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#111827;">
+      <tr>
+        <td style="padding:4px 0;color:#6b7280;">Aantal personen</td>
+        <td style="padding:4px 0;text-align:right;font-weight:600;">${escapeHtml(String(persons))}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 0;color:#6b7280;">Totaalbedrag</td>
+        <td style="padding:4px 0;text-align:right;font-weight:700;color:#047857;">€ ${escapeHtml(amount)}</td>
+      </tr>
+    </table>
+  `)
+
+  // Essentials
+  if (Object.keys(essentialsCount).length) {
+    const lines: string[] = []
+    for (const [id, baseQty] of Object.entries(essentialsCount)) {
+      const product = essentialMap[id]
+      if (!product) {
+        lines.push(`${id} (${baseQty}×)`)
+        continue
+      }
+      const qty = baseQty * (product.multiplies ? persons : 1)
+      const spec = product.subLabel ? ` – ${product.subLabel}` : ''
+      lines.push(`${product.label}${spec} (${qty}×)`)
+    }
+    parts.push(section('Essentials', list(lines)))
+  }
+
+  // Food packages
+  if (foodPackages && Number(foodPackages) > 0) {
+    parts.push(section('Voedselpakketten', list([`${foodPackages}×`])))
+  }
+
+  // Hygiene
+  if (hygiene.length) {
+    parts.push(section('Hygiëne', list(hygiene.map(k => HYGIENE_LABELS[k] || k))))
+  }
+
+  // Tools
+  if (tools.length) {
+    parts.push(section('Tools', list(tools.map(k => TOOL_LABELS[k] || k))))
+  }
+
+  // Flightbag
+  if (flightbag) {
+    parts.push(section('Vluchttas', `<p style="margin:0;color:#111827;font-size:13px;">Ja</p>`))
+  }
+
+  return parts.join('')
 }
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   if (!config.mollieApiKey) {
-    console.error('❌ MOLLIE_API_KEY ontbreekt in runtimeConfig (webhook)')
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Betaalconfiguratie ontbreekt (API key).',
-    })
+    console.error('❌ MOLLIE_API_KEY ontbreekt in runtimeConfig')
+    return 'missing api key'
   }
 
   const mollieClient = createMollieClient({
@@ -189,44 +233,37 @@ export default defineEventHandler(async (event) => {
   }
 
   const payment = await mollieClient.payments.get(body.id)
-
   console.log('📩 Webhook voor payment:', payment.id, 'status:', payment.status)
 
   if (payment.status === 'paid') {
-    const meta = payment.metadata as any
-    const amount = payment.amount.value
+    const meta = (payment.metadata || {}) as PaymentMeta
+    const amount = payment.amount?.value ?? '0.00'
+
     const itemsText = buildItemsSummaryText(meta, amount)
     const itemsHtml = buildItemsSummaryHtml(meta, amount)
 
     const address = meta?.address || {}
-    const customerEmail: string | undefined = address?.email || meta?.email
-    const customerName = address?.firstName || 'klant'
-    const persons = meta?.persons ?? '-'
+    const customerEmail = address.email || payment.billingEmail || payment.customerId || ''
 
-    // 1️⃣ Mail naar klant
+    // 1) Mail naar klant (als er een mail is)
     if (customerEmail) {
       await sendMail({
         to: customerEmail,
-        subject: 'Bevestiging van je noodpakket bestelling',
+        subject: 'Bevestiging van je bestelling – noodpakket-op-maat.nl',
         text: `
-Hi ${customerName},
-
-Bedankt voor je bestelling van het noodpakket op maat.
-Hieronder vind je een overzicht van je bestelling.
+Bedankt voor je bestelling!
 
 ${itemsText}
 
-Bezorgadres:
+Verzendadres:
 ${address.firstName || ''} ${address.lastName || ''}
 ${address.street || ''} ${address.houseNumber || ''}
 ${address.postalCode || ''} ${address.city || ''}
 ${address.country || ''}
 
-Je ontvangt een nieuwe e-mail zodra je pakket verzonden is.
-
 Hartelijke groet,
 Koen
-donskussen.nl
+noodpakket-op-maat.nl
         `.trim(),
         html: `
 <!doctype html>
@@ -235,53 +272,36 @@ donskussen.nl
     <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0;">
       <tr>
         <td align="center">
-          <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;padding:24px;border:1px solid #e5e7eb;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border-radius:16px;padding:24px;border:1px solid #e5e7eb;">
             <tr>
-              <td style="padding-bottom:16px;border-bottom:1px solid #e5e7eb;">
-                <h1 style="margin:0;font-size:20px;color:#111827;">Bevestiging van je bestelling</h1>
-                <p style="margin:4px 0 0;font-size:14px;color:#6b7280;">
-                  Bedankt voor je bestelling van het noodpakket op maat.
-                </p>
+              <td style="padding-bottom:14px;border-bottom:1px solid #e5e7eb;">
+                <h1 style="margin:0;font-size:18px;line-height:1.3;color:#111827;">Bedankt voor je bestelling!</h1>
+                <p style="margin:6px 0 0;font-size:13px;color:#6b7280;">We hebben je betaling ontvangen.</p>
               </td>
             </tr>
 
             <tr>
-              <td style="padding-top:16px;padding-bottom:16px;">
-                <p style="margin:0 0 12px;font-size:14px;color:#111827;">
-                  Hi ${customerName},
-                </p>
-                <p style="margin:0 0 12px;font-size:14px;color:#4b5563;">
-                  Hieronder vind je een overzicht van je bestelling.
-                </p>
-
+              <td style="padding-top:14px;">
                 ${itemsHtml}
+              </td>
+            </tr>
 
-                <div style="margin-top:16px;">
-                  <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#111827;">
-                    Bezorgadres
-                  </p>
-                  <p style="margin:0;font-size:13px;color:#4b5563;line-height:1.5;">
-                    ${address.firstName || ''} ${address.lastName || ''}<br />
-                    ${address.street || ''} ${address.houseNumber || ''}<br />
-                    ${address.postalCode || ''} ${address.city || ''}<br />
-                    ${address.country || ''}
-                  </p>
-                </div>
-
-                <p style="margin:12px 0 0;font-size:13px;color:#6b7280;">
-                  Je ontvangt een nieuwe e-mail zodra je noodpakket verzonden is.
+            <tr>
+              <td style="padding-top:14px;border-top:1px solid #e5e7eb;">
+                <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#111827;">Verzendadres</p>
+                <p style="margin:0;font-size:13px;color:#111827;line-height:1.5;">
+                  ${escapeHtml(`${address.firstName || ''} ${address.lastName || ''}`)}<br/>
+                  ${escapeHtml(`${address.street || ''} ${address.houseNumber || ''}`)}<br/>
+                  ${escapeHtml(`${address.postalCode || ''} ${address.city || ''}`)}<br/>
+                  ${escapeHtml(`${address.country || ''}`)}
                 </p>
               </td>
             </tr>
 
             <tr>
-              <td style="padding-top:12px;border-top:1px solid #e5e7eb;">
-                <p style="margin:0 0 4px;font-size:12px;color:#9ca3af;">
-                  Hartelijke groet,<br />
-                  Koen – Noodpakket op Maat
-                </p>
-                <p style="margin:4px 0 0;font-size:11px;color:#9ca3af;">
-                  Deze e-mail is automatisch verstuurd naar ${customerEmail}.
+              <td style="padding-top:14px;border-top:1px solid #111827;">
+                <p style="margin:0;font-size:11px;color:#6b7280;">
+                  Je ontvangt een nieuwe e-mail zodra je pakket verzonden is.
                 </p>
               </td>
             </tr>
@@ -295,88 +315,64 @@ donskussen.nl
       })
     }
 
-    // 2️⃣ Mail naar jou (Koen)
-    await sendMail({
-      to: 'koen@donskussen.nl',
-      subject: `Nieuwe noodpakket bestelling – € ${amount} (${persons} pers)`,
-      text: `
-Er is een nieuwe betaalde bestelling binnengekomen.
+    // 2) Interne admin mail (altijd, als je die hebt)
+    const adminEmail = config.adminEmail || config.public?.adminEmail
+    if (adminEmail) {
+      await sendMail({
+        to: adminEmail,
+        subject: `✅ Betaald via Mollie: ${payment.id}`,
+        text: `
+Nieuwe betaalde bestelling.
 
-Bedrag: € ${amount}
+Payment: ${payment.id}
 Status: ${payment.status}
+Bedrag: € ${amount}
 
+Bestelling:
 ${itemsText}
 
-Klant:
+Adres:
 ${address.firstName || ''} ${address.lastName || ''}
 ${address.street || ''} ${address.houseNumber || ''}
 ${address.postalCode || ''} ${address.city || ''}
 ${address.country || ''}
 
-E-mailadres klant: ${address.email || customerEmail || '-'}
-
-Volledige metadata:
+Metadata:
 ${JSON.stringify(payment.metadata, null, 2)}
-      `.trim(),
-      html: `
+        `.trim(),
+        html: `
 <!doctype html>
 <html lang="nl">
-  <body style="margin:0;padding:0;background:#0b1120;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <body style="margin:0;padding:0;background:#0b1220;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
     <table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0;">
       <tr>
         <td align="center">
-          <table width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#020617;border-radius:16px;padding:20px;border:1px solid #1f2937;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;background:#0f172a;border-radius:16px;padding:18px;border:1px solid #1f2937;color:#e5e7eb;">
             <tr>
-              <td style="padding-bottom:12px;border-bottom:1px solid #111827;">
-                <h1 style="margin:0;font-size:18px;color:#e5e7eb;">Nieuwe bestelling – noodpakket</h1>
-                <p style="margin:4px 0 0;font-size:12px;color:#9ca3af;">
-                  Payment ID: ${payment.id} – Status: ${payment.status}
-                </p>
+              <td style="padding-bottom:12px;border-bottom:1px solid #1f2937;">
+                <h1 style="margin:0;font-size:16px;color:#e5e7eb;">Nieuwe betaalde bestelling</h1>
+                <p style="margin:6px 0 0;font-size:12px;color:#9ca3af;">Automatische melding vanuit de Mollie webhook.</p>
               </td>
             </tr>
 
             <tr>
-              <td style="padding-top:12px;padding-bottom:12px;">
-                <table cellpadding="0" cellspacing="0" style="width:100%;font-size:13px;color:#e5e7eb;">
-                  <tr>
-                    <td style="padding:4px 0;color:#9ca3af;">Bedrag</td>
-                    <td style="padding:4px 0;text-align:right;font-weight:600;color:#bbf7d0;">€ ${amount}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:4px 0;color:#9ca3af;">Aantal personen</td>
-                    <td style="padding:4px 0;text-align:right;">${persons}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:4px 0;color:#9ca3af;">Klant e-mail</td>
-                    <td style="padding:4px 0;text-align:right;">${address.email || customerEmail || '-'}</td>
-                  </tr>
-                </table>
-
-                <div style="margin-top:12px;">
-                  <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#e5e7eb;">
-                    Bestelling
-                  </p>
-                  <pre style="margin:0;padding:8px;border-radius:8px;background:#020617;font-size:11px;color:#9ca3af;white-space:pre-wrap;">
-${escapeHtml(itemsText)}
-                  </pre>
-                </div>
-
-                <div style="margin-top:12px;">
-                  <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#e5e7eb;">
-                    Volledige metadata
-                  </p>
-                  <pre style="margin:0;padding:8px;border-radius:8px;background:#020617;font-size:11px;color:#9ca3af;white-space:pre-wrap;">
-${escapeHtml(JSON.stringify(payment.metadata, null, 2))}
-                  </pre>
-                </div>
+              <td style="padding-top:12px;">
+                <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#e5e7eb;">Payment</p>
+                <pre style="margin:0;padding:8px;border-radius:10px;background:#020617;font-size:11px;color:#9ca3af;white-space:pre-wrap;">${escapeHtml(`id: ${payment.id}\nstatus: ${payment.status}\nbedrag: € ${amount}`)}</pre>
               </td>
             </tr>
 
             <tr>
-              <td style="padding-top:8px;border-top:1px solid #111827;">
-                <p style="margin:0;font-size:11px;color:#6b7280;">
-                  Automatische melding vanuit de Mollie webhook.
-                </p>
+              <td style="padding-top:12px;">
+                <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#e5e7eb;">Bestelling</p>
+                <pre style="margin:0;padding:8px;border-radius:10px;background:#020617;font-size:11px;color:#9ca3af;white-space:pre-wrap;">${escapeHtml(itemsText)}</pre>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding-top:12px;">
+                <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#e5e7eb;">Volledige metadata</p>
+                <pre style="margin:0;padding:8px;border-radius:10px;background:#020617;font-size:11px;color:#9ca3af;white-space:pre-wrap;">${escapeHtml(JSON.stringify(payment.metadata, null, 2))}</pre>
               </td>
             </tr>
           </table>
@@ -385,8 +381,9 @@ ${escapeHtml(JSON.stringify(payment.metadata, null, 2))}
     </table>
   </body>
 </html>
-      `.trim(),
-    })
+        `.trim(),
+      })
+    }
   }
 
   // Mollie verwacht alleen een 200/ok response
