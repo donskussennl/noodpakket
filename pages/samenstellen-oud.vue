@@ -8,7 +8,6 @@ import {
   type EssentialProduct,
   type BulletItem // Zorg dat deze geëxporteerd is in essentialProducts.ts
 } from '~/data/essentialProducts'
-import { FOOD_INFO, FLIGHTBAG_INFO, HYGIENE_OPTS, TOOL_OPTS, type CatalogProductInfo } from '~/data/productCatalog'
 
 useHead({
   title: 'Noodpakket samenstellen - Laagste prijs van NL | Noodpakket-op-maat.nl',
@@ -34,34 +33,15 @@ useHead({
   ]
 })
 
-// --- Productcatalogus: niet-essentials (1 plek beheren) ---
-
-// --- State ---
-const showProductModal = ref(false)
-const selectedProductInfo = ref<EssentialProduct | CatalogProductInfo | null>(null)
-const showVideoModal = ref(false)
-
-// Slider-afbeeldingen in de product-modal (1 of 2 afbeeldingen)
-const getProductImages = (p: EssentialProduct | CatalogProductInfo) => {
-  const images: string[] = []
-  if (p.image) images.push(p.image)
-  const img2 = (p as any).image2 as string | undefined
-  if (img2) images.push(img2)
-  return images
+// --- Interface voor lokale producten ---
+interface LocalProductInfo {
+  id: string
+  label: string
+  subLabel?: string
+  image: string
+  description: string
+  bullets: BulletItem[]
 }
-
-const activeModalImage = ref(0)
-const modalImages = computed(() => {
-  if (!selectedProductInfo.value) return [] as string[]
-  return getProductImages(selectedProductInfo.value)
-})
-
-watch(
-  () => selectedProductInfo.value,
-  () => {
-    activeModalImage.value = 0
-  }
-)
 
 const originalPrice = computed(() => {
   return intake.value.price / 0.75  // want 25% korting → je betaalt 75%
@@ -70,6 +50,11 @@ const originalPrice = computed(() => {
 const discountAmount = computed(() => {
   return originalPrice.value - intake.value.price
 })
+
+// --- State ---
+const showProductModal = ref(false)
+const selectedProductInfo = ref<EssentialProduct | LocalProductInfo | null>(null)
+const showVideoModal = ref(false)
 
 // --- Intake Logic ---
 const {
@@ -81,14 +66,154 @@ const {
   FOOD_PACKAGE_PRICE
 } = useIntake()
 
-// --- Helpers ---
+// --- DATA: Lokale definities met info voor de modal ---
 
+const FOOD_INFO: LocalProductInfo = {
+  id: 'food',
+  label: 'Voedselpakket',
+  subLabel: '2400 kcal per dag',
+  image: '/images/noodpakket/voedselpakket-nood.png', 
+  description: 'Kies voor echt voedsel in blik en stevige verpakkingen; voedzamer en smakelijker dan poederzakjes. Gebaseerd op het advies van het Voedingscentrum.',
+  bullets: [
+    { type: 'check', text: '3–4 blikken maaltijdsoep, chili of bonen' },
+    { type: 'check', text: '3 blikken groente (mais, doperwt, wortel)' },
+    { type: 'check', text: '1–2 blikken saus en zak rijst/pasta' },
+    { type: 'check', text: 'Aanvulling: crackers, repen, jam' },
+    { type: 'dot',   text: 'Voldoende energie voor 72 uur' }
+  ]
+}
+
+const FLIGHTBAG_INFO: LocalProductInfo = {
+  id: 'flightbag',
+  label: 'Vluchttas',
+  subLabel: '30 liter (Rugzak)',
+  image: '/images/noodpakket/vluchttas.png',
+  description: 'Een stevige, ruime rugzak waar je hele noodpakket in past. Zorg dat je in geval van een evacuatie direct weg kunt.',
+  bullets: [
+    { type: 'check', text: 'Ruim hoofdcompartiment (30 liter)' },
+    { type: 'check', text: 'Stevige, comfortabele schouderbanden' },
+    { type: 'check', text: 'Houdt je handen vrij tijdens evacuatie' },
+    { type: 'dot',   text: 'Discreet design' }
+  ]
+}
+
+const HYGIENE_OPTS: LocalProductInfo[] = [
+  { 
+    id: 'handgel', 
+    label: 'Desinfectie gel', 
+    subLabel: '250 ml', 
+    image: '/images/noodpakket/handgel.jpg',
+    description: 'Houd je handen schoon, ook als er geen stromend water beschikbaar is. Cruciaal om ziektes te voorkomen.',
+    bullets: [
+      { type: 'check', text: 'Doodt 99.9% van de bacteriën' },
+      { type: 'check', text: 'Geen water nodig' },
+      { type: 'check', text: 'Sneldrogend' }
+    ]
+  },
+  { 
+    id: 'wcpapier', 
+    label: 'Wc-papier', 
+    subLabel: '4 rollen', 
+    image: '/images/noodpakket/wcpapier.jpg',
+    description: 'Een basisbehoefte die vaak als eerste opraakt in winkels tijdens noodsituaties.',
+    bullets: [
+      { type: 'check', text: '4 rollen per pakket' },
+      { type: 'check', text: 'Zacht en stevig' },
+      { type: 'dot',   text: 'Compact verpakt' }
+    ]
+  },
+  { 
+    id: 'doekjes', 
+    label: 'Natte doekjes', 
+    subLabel: 'Pak van 50 stuks', 
+    image: '/images/noodpakket/doekjes.jpg',
+    description: 'Voor snelle lichamelijke hygiëne of het schoonmaken van oppervlakken.',
+    bullets: [
+      { type: 'check', text: 'Verfrissend en reinigend' },
+      { type: 'check', text: 'Hersluitbare verpakking' },
+      { type: 'check', text: 'Geschikt voor lichaam en gezicht' }
+    ]
+  },
+  { 
+    id: 'tandenborstel', 
+    label: 'Tandpasta + tandenborstel', 
+    subLabel: 'Setje', 
+    image: '/images/noodpakket/tandenborstel.jpg',
+    description: 'Mondhygiëne is belangrijk voor je gezondheid en moraal.',
+    bullets: [
+      { type: 'check', text: 'Inclusief tandpasta' },
+      { type: 'check', text: 'Reisformaat, makkelijk mee te nemen' }
+    ]
+  },
+  { 
+    id: 'maandverband', 
+    label: 'Maandverband', 
+    subLabel: '1 pak (normaal)', 
+    image: '/images/noodpakket/maandverband.jpg',
+    description: 'Essentieel voor vrouwen in het huishouden. Kan in nood ook dienen als verbandmateriaal.',
+    bullets: [
+      { type: 'check', text: 'Hoog absorptievermogen' },
+      { type: 'check', text: 'Individueel verpakt' }
+    ]
+  },
+]
+
+const TOOL_OPTS: LocalProductInfo[] = [
+  { 
+    id: 'hammer', 
+    label: 'Hamer', 
+    subLabel: 'Klauwhamer', 
+    image: '/images/noodpakket/hamer.png',
+    description: 'Een hamer is onmisbaar voor noodreparaties, het openbreken van obstakels of het bevestigen van beschutting.',
+    bullets: [
+      { type: 'check', text: 'Stevige klauwhamer' },
+      { type: 'check', text: 'Anti-slip handvat' },
+      { type: 'dot',   text: 'Multifunctioneel inzetbaar' }
+    ]
+  },
+  { 
+    id: 'opener', 
+    label: 'Blikopener', 
+    subLabel: 'RVS', 
+    image: '/images/noodpakket/blikopener.png',
+    description: 'Zonder blikopener is je noodvoorraad in blik waardeloos. Een eenvoudig, onverwoestbaar model.',
+    bullets: [
+      { type: 'check', text: 'Werkt altijd, geen stroom nodig' },
+      { type: 'check', text: 'Roestvrij staal' },
+      { type: 'cross', text: 'Niet afhankelijk van lipjes op blikken' }
+    ]
+  },
+  { 
+    id: 'saw', 
+    label: 'Zaag', 
+    subLabel: 'Handzaag (hout)', 
+    image: '/images/noodpakket/zaag.png',
+    description: 'Om hout te zagen voor warmte, of om obstakels (zoals omgevallen bomen) weg te werken.',
+    bullets: [
+      { type: 'check', text: 'Scherp getand blad' },
+      { type: 'check', text: 'Compact formaat' }
+    ]
+  },
+  { 
+    id: 'tang', 
+    label: 'Kniptang', 
+    subLabel: 'Gehard staal', 
+    image: '/images/noodpakket/tang.png',
+    description: 'Voor het doorknippen van draden, kabels of het losmaken van vastzittende objecten.',
+    bullets: [
+      { type: 'check', text: 'Sterke knipkracht' },
+      { type: 'check', text: 'Geisoleerde handvaten' }
+    ]
+  },
+]
+
+// --- Helpers ---
 
 const formatPriceDot = (amount: number) => {
   return amount.toFixed(2).replace('.', ',')
 }
 
-const getProductLabel = (product?: EssentialProduct | CatalogProductInfo | null) => {
+const getProductLabel = (product?: EssentialProduct | LocalProductInfo | null) => {
   if (!product) return ''
   const p = product as EssentialProduct
   const persons = intake.value.persons || 1
@@ -621,46 +746,13 @@ watch(
           <button type="button" class="text-slate-400 hover:text-slate-600" @click="closeProductModal">✕</button>
         </div>
         <div class="space-y-3">
-          <div v-if="modalImages.length" class="space-y-3">
-            <div class="w-full aspect-[4/3] rounded-xl bg-[#FFFDF3] border border-slate-100 flex items-center justify-center p-8 relative overflow-hidden">
-
-              <button
-                v-if="modalImages.length > 1"
-                type="button"
-                class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:bg-white"
-                @click="activeModalImage = (activeModalImage - 1 + modalImages.length) % modalImages.length"
-                aria-label="Vorige afbeelding"
-              >‹</button>
-
-              <img
-                :src="modalImages[activeModalImage]"
-                :alt="selectedProductInfo.label"
-                class="w-full h-full object-contain drop-shadow-[10px_10px_20px_rgba(0,0,0,0.25)]"
-              />
-
-              <button
-                v-if="modalImages.length > 1"
-                type="button"
-                class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 border border-slate-200 shadow-sm flex items-center justify-center text-slate-700 hover:bg-white"
-                @click="activeModalImage = (activeModalImage + 1) % modalImages.length"
-                aria-label="Volgende afbeelding"
-              >›</button>
-            </div>
-
-            <div v-if="modalImages.length > 1" class="flex items-center justify-center gap-2">
-              <button
-                v-for="(img, i) in modalImages"
-                :key="img + i"
-                type="button"
-                class="w-12 h-12 rounded-xl border bg-white overflow-hidden flex items-center justify-center"
-                :class="i === activeModalImage ? 'border-emerald-500 ring-2 ring-emerald-200' : 'border-slate-200 hover:border-slate-300'"
-                @click="activeModalImage = i"
-                :aria-label="`Afbeelding ${i+1}`"
-              >
-                <img :src="img" alt="" class="w-full h-full object-contain" />
-              </button>
-            </div>
-          </div>
+          <div v-if="selectedProductInfo.image" class="w-full aspect-[4/3] rounded-xl bg-[#FFFDF3] border border-slate-100 flex items-center justify-center p-8">
+            <img 
+                :src="selectedProductInfo.image" 
+                :alt="selectedProductInfo.label" 
+                class="w-full h-full object-contain drop-shadow-[10px_10px_20px_rgba(0,0,0,0.25)]" 
+              />         
+           </div>
           <p class="text-sm text-slate-700">{{ selectedProductInfo.description }}</p>
           <ul v-if="selectedProductInfo.bullets?.length" class="space-y-2">
             <li v-for="(item, index) in selectedProductInfo.bullets" :key="index" class="flex items-start gap-2 text-sm text-slate-700">

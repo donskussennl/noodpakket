@@ -302,7 +302,7 @@ watch(intake, () => calculatePrice(), { deep: true })
     <div class="sticky top-0 z-30  backdrop-blur-sm border-b border-slate-100">
       <div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
         <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Winkelmandje</h1>
-        <NuxtLink to="/samenstellen-deluxe" class="text-sm font-medium text-emerald-600">
+        <NuxtLink to="/samenstellen" class="text-sm font-medium text-emerald-600">
           Aanpassen
         </NuxtLink>
       </div>

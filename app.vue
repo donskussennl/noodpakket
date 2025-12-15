@@ -72,7 +72,7 @@
           </div>
         </div>
       </footer>
-    <Analytics />
+
     </div>
 
   </NuxtLayout>

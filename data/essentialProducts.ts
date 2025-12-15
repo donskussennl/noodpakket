@@ -25,10 +25,14 @@ export interface EssentialProduct {
   id: EssentialProductKey
   label: string
   image: string
+  image2?: string
   description: string
-  price: number          // Nieuw: losse prijs
-  multiplies: boolean    // Nieuw: true als dit x aantal personen moet (bv water)
-  subLabel?: string  // <--- NIEUW: Optioneel veld voor specificaties
+  price: number
+  oldPrice?: number
+  promoLabel?: string
+  category?: string
+  multiplies: boolean
+  subLabel?: string
   bullets?: BulletItem[]
 }
 
@@ -36,6 +40,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'water',
     label: 'Wateropslag',
+    category: 'Water',
     image: '/images/noodpakket/wateropslag.png',
     description: 'Deze watervoorziening geeft tijdens een noodsituatie direct toegang tot schoon drinkwater. De watervoorziening bevat 72 uur aan drinkwater voor 1 persoon.',
     price: 7.90,
@@ -51,6 +56,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'radio',
     label: 'FM-Noodradio',
+    category: 'Communicatie',
     image: '/images/noodpakket/noodradio-batterijen.png',
     description: `Met deze noodradio blijf je op de hoogte van belangrijke berichten van overheid en hulpdiensten.`,
     price: 19.90,
@@ -65,6 +71,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'powerbank',
     label: 'Powerbank',
+    category: 'Energie',
     image: '/images/noodpakket/powerbank.png',
     description: 'Met deze powerbank blijft je telefoon bereikbaar voor bellen, berichten en informatie.',
     price: 19.90,
@@ -79,6 +86,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'blanket',
     label: 'Deken + kussen',
+    category: 'Warmte',
     image: '/images/noodpakket/blanket.png',
     description: 'Zorg voor voldoende warmte en comfort bij stroomuitval of een noodsituatie.',
     price: 9.90,
@@ -93,6 +101,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'map',
     label: 'Plattegrond',
+    category: 'Navigatie',
     image: '/images/noodpakket/kaart.png',
     description: 'Een fysieke kaart van je woonplaats helpt je navigeren wanneer GPS, internet of telefoons niet werken.',
     price: 0.50,
@@ -107,6 +116,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'flashlight',
     label: 'Zaklamp',
+    category: 'Licht',
     image: '/images/noodpakket/zaklamp.png',
     description: 'Een betrouwbare zaklamp is essentieel bij stroomuitval.',
     price: 1.65,
@@ -121,6 +131,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'batteries',
     label: 'AAA Batterijen',
+    category: 'Energie',
     image: '/images/noodpakket/batterijen.png',
     description: 'Reservebatterijen zorgen ervoor dat je noodradio en zaklamp blijven werken.',
     price: 3.80,
@@ -135,6 +146,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'firstaid',
     label: 'EHBO-kit',
+    category: 'EHBO',
     image: '/images/noodpakket/ehbo-kit.png',
     description: 'Een compacte maar complete EHBO-kit voor kleine verwondingen.',
     price: 7.90,
@@ -149,6 +161,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'matches',
     label: 'Aanstekers',
+    category: 'Vuur',
     image: '/images/noodpakket/aansteker.png',
     description: 'Aanstekers geven je de zekerheid dat je altijd vuur kunt maken.',
     price: 1.50,
@@ -162,6 +175,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'candles',
     label: 'Kaarsen',
+    category: 'Licht',
     image: '/images/noodpakket/kaarsen.png',
     description: 'Noodkaarsen geven langdurig licht tijdens stroomuitval.',
     price: 0.90,
@@ -176,6 +190,7 @@ export const ESSENTIAL_PRODUCTS: EssentialProduct[] = [
   {
     id: 'whistle',
     label: 'Noodfluitje',
+    category: 'Communicatie',
     image: '/images/noodpakket/fluit.png',
     description: 'Met een noodfluitje kun je jezelf hoorbaar maken.',
     price: 3.65,

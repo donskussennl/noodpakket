@@ -3,19 +3,32 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['@nuxtjs/tailwindcss', 'nuxt-gtag'],
+  // Keep Tailwind; remove GA modules to avoid duplicate / inconsistent injection.
+  modules: ['@nuxtjs/tailwindcss'],
 
-  // --- NIEUW STUKJE: Hier moet je ID staan ---
-  gtag: {
-    id: process.env.NUXT_PUBLIC_GA_ID, // <-- Plak hier het ID uit Google Analytics (bijv. G-XZ123456)
-    loadingStrategy: 'async',
-    enabled: true,      // expliciet
-    initMode: 'auto',
-  },
-  // ------------------------------------------
-
+  // ✅ GA4 (hard-coded) — this guarantees the gtag script is present in the HTML.
   app: {
     head: {
+      script: [
+        {
+          src: 'https://www.googletagmanager.com/gtag/js?id=G-W4K1B0FNL2',
+          async: true
+        },
+        {
+          type: 'text/javascript',
+          hid: 'ga4-inline',
+          innerHTML: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', 'G-W4K1B0FNL2', { send_page_view: false });
+          `
+        }
+      ],
+      __dangerouslyDisableSanitizersByTagID: {
+        'ga4-inline': ['innerHTML']
+      },
       meta: [
         { name: 'google-site-verification', content: 'a7MTrBQVFydgpWB6HiuKPdLZZX3oB9Csc5giiHxMiRY' },
 
@@ -32,9 +45,7 @@ export default defineNuxtConfig({
           content: 'https://www.noodpakket-op-maat.nl/images/noodpakket/noodpakket-compleet.jpg'
         }
       ],
-      link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v=2' }
-      ]
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v=2' }]
     }
   },
 
@@ -44,6 +55,6 @@ export default defineNuxtConfig({
     mollieWebhookUrl: process.env.MOLLIE_WEBHOOK_URL,
 
     resendApiKey: process.env.RESEND_API_KEY,
-    emailFrom: process.env.EMAIL_FROM || 'no-reply@noodpakket-op-maat.nl',
+    emailFrom: process.env.EMAIL_FROM || 'no-reply@noodpakket-op-maat.nl'
   }
-});
+})
